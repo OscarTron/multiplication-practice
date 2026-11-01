@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -35,6 +35,19 @@
           <datalist id="player-list"></datalist>
           <p id="player-error" class="field-error" role="alert"></p>
         </div>
+        <fieldset class="avatar-picker">
+          <legend>Choose your animal</legend>
+          <div id="avatar-options" class="avatar-options">
+            <button class="avatar-option selected" type="button" data-icon="🐨" aria-label="Koala" aria-pressed="true">🐨</button>
+            <button class="avatar-option" type="button" data-icon="🐻" aria-label="Bear" aria-pressed="false">🐻</button>
+            <button class="avatar-option" type="button" data-icon="🐭" aria-label="Mouse" aria-pressed="false">🐭</button>
+            <button class="avatar-option" type="button" data-icon="🐍" aria-label="Snake" aria-pressed="false">🐍</button>
+            <button class="avatar-option" type="button" data-icon="🐛" aria-label="Caterpillar" aria-pressed="false">🐛</button>
+            <button class="avatar-option" type="button" data-icon="🦋" aria-label="Butterfly" aria-pressed="false">🦋</button>
+            <button class="avatar-option" type="button" data-icon="🦉" aria-label="Owl" aria-pressed="false">🦉</button>
+            <button class="avatar-option" type="button" data-icon="🦊" aria-label="Fox" aria-pressed="false">🦊</button>
+          </div>
+        </fieldset>
         <details class="settings-panel">
           <summary>
             <span>Practice settings</span>
@@ -131,6 +144,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=10"></script>
+    <script src="app-v8.js?v=11"></script>
   </body>
 </html>

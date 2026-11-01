@@ -26,9 +26,11 @@ Student uses the original 20-question, 10-minute format. Scholar gives 30 questi
 - Three selectable practice levels with separate records
 - Correct and incorrect visual feedback with optional sound effects
 - Player profiles with separate practice records
+- Selectable animal icons for each player profile
 - Device-local family leaderboard for perfect rounds
 - Device-local records and offline caching
 - Responsive keyboard-accessible interface
+- Original sci-fi interface typography using an offline system-font stack
 
 ## Run locally
 

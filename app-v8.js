@@ -8,12 +8,13 @@
     3: { name: "Prodigy", count: null, seconds: 120, text: "Prodigy: answer as many questions as you can in 2 minutes." },
   };
   const DEFAULTS = { level: 1, range: 10, focus: "all" };
+  const ICONS = ["🐨", "🐻", "🐭", "🐍", "🐛", "🦋", "🦉", "🦊"];
   const $ = (selector) => document.querySelector(selector);
   const el = {
     start: $("#start-screen"), quiz: $("#quiz-screen"), results: $("#results-screen"),
     startButton: $("#start-button"), retryButton: $("#retry-button"), timer: $("#timer"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
-    playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
+    playerList: $("#player-list"), playerError: $("#player-error"), avatarButtons: document.querySelectorAll(".avatar-option"), level: $("#level-select"),
     range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
     levelDescription: $("#level-description"), leaderboard: $("#leaderboard-list"),
     leaderboardRule: $("#leaderboard-rule"), stripAnswered: $("#strip-answered"),
@@ -27,6 +28,7 @@
 
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
+  let selectedIcon = ICONS[0];
   let audioContext = null;
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
@@ -53,13 +55,14 @@
   const playerKey = (value) => cleanName(value).toLocaleLowerCase();
   function cleanPlayer(value, fallback) {
     const displayName = cleanName((value && value.displayName) || fallback);
+    const icon = value && ICONS.includes(value.icon) ? value.icon : ICONS[0];
     const recordsByMode = {};
     if (value && value.recordsByMode && typeof value.recordsByMode === "object") {
       Object.entries(value.recordsByMode).forEach(([key, records]) => { recordsByMode[key] = cleanRecords(records); });
     } else if (value && typeof value === "object") {
       recordsByMode["level1-range12-mixed"] = cleanRecords(value);
     }
-    return { displayName, recordsByMode };
+    return { displayName, icon, recordsByMode };
   }
   function load() {
     try {
@@ -182,7 +185,10 @@
     ranking.slice(0, 5).forEach((player, position) => {
       const row = document.createElement("li"); row.className = "leaderboard-row";
       const rank = document.createElement("span"); rank.className = "leaderboard-rank"; rank.textContent = position + 1;
-      const name = document.createElement("span"); name.className = "leaderboard-name"; name.textContent = player.displayName;
+      const name = document.createElement("span"); name.className = "leaderboard-name";
+      const avatar = document.createElement("span"); avatar.className = "leaderboard-avatar"; avatar.textContent = player.icon;
+      const playerName = document.createElement("span"); playerName.textContent = player.displayName;
+      name.append(avatar, playerName);
       const result = document.createElement("span"); result.className = "leaderboard-time";
       result.textContent = settings.level === 3 ? `${player.record.bestScore}% · ${player.record.bestCorrect}` : formatTime(player.record.fastestPerfect);
       row.append(rank, name, result); el.leaderboard.append(row);
@@ -191,6 +197,21 @@
   function refresh() {
     showSettings(); showRecords(); showPlayers();
     const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
+  }
+  function showSelectedIcon() {
+    el.avatarButtons.forEach((button) => {
+      const selected = button.dataset.icon === selectedIcon;
+      button.classList.toggle("selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+  }
+  function selectIcon(icon) {
+    if (!ICONS.includes(icon)) return;
+    selectedIcon = icon; showSelectedIcon();
+    const state = load(), key = playerKey(el.playerName.value);
+    if (state.players[key]) {
+      state.players[key].icon = selectedIcon; save(state); showPlayers();
+    }
   }
 
   function playTone(isCorrect) {
@@ -254,7 +275,8 @@
     const displayName = cleanName(el.playerName.value);
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
-    if (!state.players[key]) state.players[key] = { displayName, recordsByMode: {} };
+    if (!state.players[key]) state.players[key] = { displayName, icon: selectedIcon, recordsByMode: {} };
+    state.players[key].icon = selectedIcon;
     state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
@@ -300,13 +322,22 @@
   }
 
   el.startButton.addEventListener("click", () => start(true)); el.retryButton.addEventListener("click", () => start(false));
-  el.playerName.addEventListener("input", () => { el.playerError.textContent = ""; showRecords(); });
+  el.playerName.addEventListener("input", () => {
+    el.playerError.textContent = ""; showRecords();
+    const player = load().players[playerKey(el.playerName.value)];
+    if (player) { selectedIcon = player.icon; showSelectedIcon(); }
+  });
   el.playerName.addEventListener("keydown", (event) => { if (event.key === "Enter") start(true); });
   el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
+  el.avatarButtons.forEach((button) => { button.addEventListener("click", () => selectIcon(button.dataset.icon)); });
   el.range.addEventListener("change", () => { fillFocus(Number(el.range.value), el.focus.value); refresh(); });
 
   const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
-  if (initial.players[initial.currentPlayer]) el.playerName.value = initial.players[initial.currentPlayer].displayName;
+  if (initial.players[initial.currentPlayer]) {
+    el.playerName.value = initial.players[initial.currentPlayer].displayName;
+    selectedIcon = initial.players[initial.currentPlayer].icon;
+  }
+  showSelectedIcon();
   refresh();
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("service-worker.js").catch(() => {});
 })();

@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Eight selectable animal icons saved with each player profile.
 - Correct and incorrect answer animations with optional device-generated tones.
 - A saved sound-effects setting that defaults to off.
 - Practice settings for standard 0–10 and extended 0–12 ranges.
@@ -28,6 +29,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Introduced an original, offline sci-fi interface typography treatment.
+- Added player animals to family leaderboard entries.
 - Renamed the three levels Student, Scholar, and Prodigy.
 - Made Level 1 with mixed 0–10 facts the default practice mode.
 - Simplified adaptive-practice wording for younger readers.

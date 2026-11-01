@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: ui-rounded, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  font-family: "Arial Narrow", "Roboto Condensed", "Bahnschrift Condensed", "Segoe UI", sans-serif;
   color: #18334f;
   background: #f2faf7;
   --teal: #18a999;
@@ -30,6 +30,7 @@ body {
 
 button { font: inherit; }
 h1, h2, p { margin-top: 0; }
+h1, h2, h3, .eyebrow, .round-label, button, label, select { letter-spacing: .035em; }
 
 .app-shell {
   width: min(760px, calc(100% - 32px));
@@ -108,6 +109,13 @@ h2 { font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 900; letter-spacing: 
 }
 .player-panel input:focus { border-color: var(--teal); box-shadow: 0 4px 0 #9bd8cc; }
 .field-error { min-height: 20px; margin: 7px 3px 0; color: #b43c32; font-size: .78rem; font-weight: 800; }
+.avatar-picker { max-width: 520px; margin: 4px auto 16px; padding: 0; border: 0; text-align: left; }
+.avatar-picker legend { margin-bottom: 8px; color: var(--muted); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.avatar-options { display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; }
+.avatar-option { display: grid; min-width: 0; aspect-ratio: 1; place-items: center; border: 2px solid var(--line); border-radius: 13px; background: white; box-shadow: 0 3px 0 #d4e5e0; font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif; font-size: 1.45rem; cursor: pointer; }
+.avatar-option:hover { border-color: var(--teal); }
+.avatar-option.selected { border-color: var(--navy); background: var(--teal-soft); box-shadow: 0 3px 0 var(--navy); transform: translateY(-1px); }
+.avatar-option:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 .settings-panel { max-width: 520px; margin: 12px auto 0; border: 2px solid var(--line); border-radius: 17px; background: var(--cream); text-align: left; }
 .settings-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; cursor: pointer; list-style: none; }
 .settings-panel summary::-webkit-details-marker { display: none; }
@@ -155,7 +163,8 @@ h2 { font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 900; letter-spacing: 
 .leaderboard-list { display: grid; gap: 8px; margin: 13px 0 0; padding: 0; list-style: none; }
 .leaderboard-row, .leaderboard-empty { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 9px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 13px; background: var(--cream); }
 .leaderboard-rank { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; color: var(--teal-dark); background: var(--teal-soft); font-size: .78rem; font-weight: 900; }
-.leaderboard-name { overflow: hidden; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard-name { display: flex; align-items: center; gap: 7px; overflow: hidden; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard-avatar { font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif; font-size: 1.2rem; }
 .leaderboard-time { font-variant-numeric: tabular-nums; font-weight: 900; }
 .leaderboard-empty { display: block; color: var(--muted); text-align: center; font-size: .82rem; font-weight: 700; }
 
@@ -249,6 +258,8 @@ h2 { font-size: clamp(1.75rem, 5vw, 2.55rem); font-weight: 900; letter-spacing: 
   .timer { min-width: 84px; padding-inline: 8px; }
   .card { border-radius: 22px; }
   .records { gap: 7px; }
+  .avatar-options { grid-template-columns: repeat(4, 1fr); }
+  .avatar-option { aspect-ratio: auto; min-height: 48px; }
   .settings-grid { grid-template-columns: 1fr; }
   .settings-panel summary { align-items: flex-start; }
   .settings-panel summary strong { max-width: 150px; }

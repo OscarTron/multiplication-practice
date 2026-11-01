@@ -32,6 +32,7 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [x] Add Student, Scholar, and Prodigy levels with separate records.
 - [x] Rename the levels Student, Scholar, and Prodigy.
 - [x] Add correct and incorrect feedback effects with optional sound.
+- [x] Add selectable animal icons to player profiles and leaderboard entries.
 - [ ] Add a simple 30-minute daily-practice indicator.
 
 ## Phase 3 — Motivation and progress

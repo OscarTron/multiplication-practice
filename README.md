@@ -59,6 +59,7 @@ Player names, scores, and practice history stay in the current browser. The fami
 - `PLAN.md` — roadmap and completion status
 - `CHANGELOG.md` — release history
 - `CHILD_USABILITY_REVIEW.md` — child-focused review and parent test checklist
+- `DESIGN_RULES.md` — interface consistency rules for future changes
 
 ## License
 

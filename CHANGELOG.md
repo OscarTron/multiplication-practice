@@ -31,6 +31,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Standardized the interface around one content width, one control height, four text sizes, and consistent spacing.
+- Reduced headline size and font-weight variation for a calmer, more symmetrical start screen.
 - Introduced an original, offline sci-fi interface typography treatment.
 - Renamed the three levels Student, Scholar, and Prodigy.
 - Made Level 1 with mixed 0–10 facts the default practice mode.

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="styles.css?v=21" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -27,7 +27,6 @@
 
       <section id="start-screen" class="card start-screen">
         <div class="start-heading">
-          <h2>Ready to practice?</h2>
           <p id="round-label" class="round-label">Student · 20 questions · 10 minutes</p>
         </div>
         <div class="player-panel">
@@ -90,6 +89,7 @@
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
         </details>
+        <button id="start-button" class="primary-button" type="button">Start practice</button>
         <section class="learn-panel" aria-labelledby="learn-title">
           <div class="section-heading"><h3 id="learn-title">Learn</h3><span>Review before testing</span></div>
           <div class="learn-actions">
@@ -97,25 +97,29 @@
             <button id="open-cards" class="secondary-button" type="button">Study cards</button>
           </div>
         </section>
-        <div id="records" class="records" aria-label="Personal records"></div>
-        <button id="start-button" class="primary-button" type="button">Start practice</button>
-        <section class="leaderboard" aria-labelledby="leaderboard-title">
-          <div class="section-heading">
-            <h3 id="leaderboard-title">Family leaderboard</h3>
-            <span id="leaderboard-rule">100% rounds only</span>
+        <details class="progress-panel my-progress-panel">
+          <summary>My progress</summary>
+          <div class="my-progress-content">
+            <div id="records" class="records" aria-label="Personal records"></div>
+            <section class="leaderboard" aria-labelledby="leaderboard-title">
+              <div class="section-heading">
+                <h3 id="leaderboard-title">Family leaderboard</h3>
+                <span id="leaderboard-rule">100% rounds only</span>
+              </div>
+              <ol id="leaderboard-list" class="leaderboard-list"></ol>
+            </section>
+            <section class="progress-data-section" aria-labelledby="progress-data-title">
+              <h3 id="progress-data-title">Round history</h3>
+              <div class="progress-table-wrap">
+                <table class="progress-table">
+                  <thead><tr><th>Date</th><th>Mode</th><th>Score</th><th>Correct</th><th>Time</th></tr></thead>
+                  <tbody id="progress-body"></tbody>
+                </table>
+              </div>
+              <p id="progress-empty" class="progress-empty">Complete a round to begin tracking progress.</p>
+              <button id="export-progress" class="text-button" type="button">Download CSV</button>
+            </section>
           </div>
-          <ol id="leaderboard-list" class="leaderboard-list"></ol>
-        </section>
-        <details class="progress-panel">
-          <summary>Progress data</summary>
-          <div class="progress-table-wrap">
-            <table class="progress-table">
-              <thead><tr><th>Date</th><th>Mode</th><th>Score</th><th>Correct</th><th>Time</th></tr></thead>
-              <tbody id="progress-body"></tbody>
-            </table>
-          </div>
-          <p id="progress-empty" class="progress-empty">Complete a round to begin tracking progress.</p>
-          <button id="export-progress" class="text-button" type="button">Download CSV</button>
         </details>
       </section>
 
@@ -187,6 +191,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=20"></script>
+    <script src="app-v8.js?v=21"></script>
   </body>
 </html>

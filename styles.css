@@ -100,8 +100,7 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
 }
 
 .start-screen { text-align: center; }
-.start-heading { display: flex; width: 100%; max-width: var(--content-width); margin: 0 auto var(--space-4); align-items: center; justify-content: space-between; gap: var(--space-3); text-align: left; }
-.start-heading h2 { margin: 0; font-size: 1.15rem; }
+.start-heading { width: 100%; max-width: var(--content-width); margin: 0 auto var(--space-3); text-align: left; }
 .start-screen .round-label { flex: 0 0 auto; margin: 0; padding: 8px 13px; border-radius: 999px; color: var(--teal-dark); background: var(--teal-soft); letter-spacing: .04em; white-space: nowrap; }
 .player-panel { width: 100%; max-width: var(--content-width); margin: var(--space-4) auto 0; text-align: left; }
 .player-panel label { display: block; margin-bottom: var(--space-1); font-size: var(--text-label); font-weight: 700; }
@@ -193,6 +192,7 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
 .primary-button:hover { background: #159b8d; transform: translateY(-1px); box-shadow: 0 7px 0 var(--teal-dark); }
 .primary-button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--teal-dark); }
 .primary-button:focus-visible, .secondary-button:focus-visible, .text-button:focus-visible, .settings-panel summary:focus-visible, .progress-panel summary:focus-visible, .choice:focus-visible { outline: 4px solid var(--yellow); outline-offset: 4px; }
+.start-screen > #start-button { display: block; width: 100%; max-width: var(--content-width); margin: var(--space-4) auto 0; }
 
 .leaderboard { width: 100%; max-width: var(--content-width); margin: var(--space-5) auto 0; padding-top: var(--space-4); border-top: 2px solid var(--line); text-align: left; }
 .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
@@ -211,6 +211,10 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
 .progress-panel summary::after { content: "+"; display: grid; width: 26px; height: 26px; place-items: center; border-radius: 8px; color: white; background: var(--navy); font-size: 1.2rem; }
 .progress-panel[open] summary { margin-bottom: 16px; }
 .progress-panel[open] summary::after { content: "−"; }
+.my-progress-content { padding-top: 2px; }
+.my-progress-content .records { margin-top: var(--space-4); }
+.progress-data-section { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 2px solid var(--line); }
+.progress-data-section h3 { margin: 0 0 12px; font-size: 1.05rem; }
 .progress-table-wrap { margin-top: 14px; overflow-x: auto; }
 .progress-table { width: 100%; border-collapse: collapse; font-size: .76rem; }
 .progress-table th, .progress-table td { padding: 9px 7px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }

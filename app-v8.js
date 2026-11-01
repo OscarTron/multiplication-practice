@@ -25,11 +25,16 @@
     score: $("#score"), correctCount: $("#correct-count"), elapsedTime: $("#elapsed-time"),
     answerFeedback: $("#answer-feedback"), resultMessage: $("#result-message"), corrections: $("#corrections"),
     progressBody: $("#progress-body"), progressEmpty: $("#progress-empty"), exportProgress: $("#export-progress"),
+    chart: $("#chart-screen"), cards: $("#cards-screen"), openChart: $("#open-chart"), openCards: $("#open-cards"), chartHome: $("#chart-home"), cardsHome: $("#cards-home"),
+    chartWrap: $("#chart-wrap"), tableCheckboxes: $("#table-checkboxes"), selectAllTables: $("#select-all-tables"), clearTables: $("#clear-tables"),
+    startCards: $("#start-cards"), cardsError: $("#cards-error"), cardSetup: $("#card-setup"), cardSession: $("#card-session"), cardComplete: $("#card-complete"),
+    studyCard: $("#study-card"), cardProgress: $("#card-progress"), previousCard: $("#previous-card"), nextCard: $("#next-card"), restartCards: $("#restart-cards"),
   };
 
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
   let audioContext = null;
+  let studyCards = [], studyIndex = 0, studyStartedAt = 0, studyTimerId = null;
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
   function cleanRecords(value) {
@@ -46,7 +51,7 @@
     const source = value && typeof value === "object" ? value : {};
     const level = [1, 2, 3].includes(Number(source.level)) ? Number(source.level) : 1;
     const range = Number(source.range) === 12 ? 12 : 10;
-    const practiceMinutes = [10, 20, 30].includes(Number(source.practiceMinutes)) ? Number(source.practiceMinutes) : 10;
+    const practiceMinutes = [5, 10, 20, 30].includes(Number(source.practiceMinutes)) ? Number(source.practiceMinutes) : 10;
     const candidate = source.focus === "all" ? "all" : Number(source.focus);
     const focus = candidate === "all" || (Number.isInteger(candidate) && candidate >= 0 && candidate <= range) ? String(candidate) : "all";
     return { level, range, focus, practiceMinutes };
@@ -254,7 +259,57 @@
       });
     } catch { /* Visual feedback remains available if audio is blocked. */ }
   }
-  function screen(name) { el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results"; }
+  function screen(name) {
+    el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results";
+    el.chart.hidden = name !== "chart"; el.cards.hidden = name !== "cards";
+  }
+  function buildChart() {
+    const range = Number(el.range.value), table = document.createElement("table"); table.className = "multiplication-chart";
+    const head = document.createElement("tr");
+    for (let column = -1; column <= range; column += 1) { const cell = document.createElement("th"); cell.textContent = column < 0 ? "×" : column; cell.dataset.column = column; head.append(cell); }
+    table.append(head);
+    for (let row = 0; row <= range; row += 1) {
+      const line = document.createElement("tr"), label = document.createElement("th"); label.textContent = row; label.dataset.row = row; line.append(label);
+      for (let column = 0; column <= range; column += 1) { const cell = document.createElement("td"); cell.textContent = row * column; cell.dataset.row = row; cell.dataset.column = column; line.append(cell); }
+      table.append(line);
+    }
+    table.addEventListener("click", (event) => {
+      const cell = event.target.closest("th, td"); if (!cell) return; const row = cell.dataset.row, column = cell.dataset.column;
+      table.querySelectorAll(".chart-highlight").forEach((item) => item.classList.remove("chart-highlight"));
+      if (row !== undefined) table.querySelectorAll(`[data-row="${row}"]`).forEach((item) => item.classList.add("chart-highlight"));
+      if (column !== undefined && Number(column) >= 0) table.querySelectorAll(`[data-column="${column}"]`).forEach((item) => item.classList.add("chart-highlight"));
+    });
+    el.chartWrap.replaceChildren(table);
+  }
+  function buildTableChoices() {
+    const range = Number(el.range.value); el.tableCheckboxes.replaceChildren();
+    for (let number = 0; number <= range; number += 1) {
+      const label = document.createElement("label"), input = document.createElement("input"); input.type = "checkbox"; input.value = number; input.checked = true;
+      label.append(input, document.createTextNode(` ×${number}`)); el.tableCheckboxes.append(label);
+    }
+  }
+  function renderStudyCard() {
+    const card = studyCards[studyIndex]; el.studyCard.innerHTML = `<span>${card.left} × ${card.right}</span><strong>= ${card.left * card.right}</strong>`;
+    el.cardProgress.textContent = `Card ${studyIndex + 1} of ${studyCards.length}`; el.previousCard.disabled = studyIndex === 0;
+  }
+  function finishStudy() {
+    clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = "0:00"; el.cardSession.hidden = true; el.cardComplete.hidden = false; el.restartCards.focus();
+  }
+  function updateStudyTimer() {
+    const remaining = 300 - Math.floor((Date.now() - studyStartedAt) / 1000); el.timer.textContent = formatTime(remaining); if (remaining <= 0) finishStudy();
+  }
+  function startStudy() {
+    const selected = [...el.tableCheckboxes.querySelectorAll("input:checked")].map((input) => Number(input.value));
+    if (!selected.length) { el.cardsError.textContent = "Choose at least one table."; return; }
+    const range = Number(el.range.value); studyCards = shuffle(selected.flatMap((left) => Array.from({ length: range + 1 }, (_, right) => ({ left, right }))));
+    studyIndex = 0; studyStartedAt = Date.now(); el.cardsError.textContent = ""; el.cardSetup.hidden = true; el.cardComplete.hidden = true; el.cardSession.hidden = false;
+    el.timer.textContent = "5:00"; renderStudyCard(); clearInterval(studyTimerId); studyTimerId = setInterval(updateStudyTimer, 250);
+  }
+  function openLearn(name) {
+    clearInterval(timerId); clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = name === "cards" ? "5:00" : formatTime(timerSeconds(settingsFromUI()));
+    if (name === "chart") buildChart(); else { buildTableChoices(); el.cardSetup.hidden = false; el.cardSession.hidden = true; el.cardComplete.hidden = true; }
+    screen(name);
+  }
   function updateTimer() {
     const level = LEVELS[activeSettings.level], duration = timerSeconds(activeSettings), elapsed = Math.floor((Date.now() - startedAt) / 1000), remaining = duration - elapsed;
     el.timer.textContent = formatTime(remaining);
@@ -350,12 +405,20 @@
   }
 
   function goHome() {
-    clearInterval(timerId); timerId = null; clearTimeout(unlockId); locked = false;
+    clearInterval(timerId); timerId = null; clearInterval(studyTimerId); studyTimerId = null; clearTimeout(unlockId); locked = false;
     el.timer.textContent = formatTime(timerSeconds(settingsFromUI()));
     screen("start"); refresh(); el.startButton.focus();
   }
 
   el.startButton.addEventListener("click", () => start(true)); el.retryButton.addEventListener("click", () => start(false)); el.homeButton.addEventListener("click", goHome);
+  el.openChart.addEventListener("click", () => openLearn("chart")); el.openCards.addEventListener("click", () => openLearn("cards"));
+  el.chartHome.addEventListener("click", goHome); el.cardsHome.addEventListener("click", goHome);
+  el.selectAllTables.addEventListener("click", () => el.tableCheckboxes.querySelectorAll("input").forEach((input) => { input.checked = true; }));
+  el.clearTables.addEventListener("click", () => el.tableCheckboxes.querySelectorAll("input").forEach((input) => { input.checked = false; }));
+  el.startCards.addEventListener("click", startStudy);
+  el.restartCards.addEventListener("click", () => { buildTableChoices(); el.timer.textContent = "5:00"; el.cardSetup.hidden = false; el.cardComplete.hidden = true; });
+  el.previousCard.addEventListener("click", () => { if (studyIndex > 0) { studyIndex -= 1; renderStudyCard(); } });
+  el.nextCard.addEventListener("click", () => { studyIndex = (studyIndex + 1) % studyCards.length; renderStudyCard(); });
   el.playerName.addEventListener("input", () => {
     el.playerError.textContent = ""; showRecords(); showProgress();
   });

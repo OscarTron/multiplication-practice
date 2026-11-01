@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=16" />
+    <link rel="stylesheet" href="styles.css?v=17" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -60,6 +60,7 @@
             <label id="practice-time-setting">
               <span>Practice time</span>
               <select id="practice-time-select">
+                <option value="5">5 minutes</option>
                 <option value="10">10 minutes</option>
                 <option value="20">20 minutes</option>
                 <option value="30">30 minutes</option>
@@ -89,6 +90,13 @@
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
         </details>
+        <section class="learn-panel" aria-labelledby="learn-title">
+          <div class="section-heading"><h3 id="learn-title">Learn</h3><span>Review before testing</span></div>
+          <div class="learn-actions">
+            <button id="open-chart" class="secondary-button" type="button">Review chart</button>
+            <button id="open-cards" class="secondary-button" type="button">Study cards</button>
+          </div>
+        </section>
         <div id="records" class="records" aria-label="Personal records"></div>
         <button id="start-button" class="primary-button" type="button">Start practice</button>
         <section class="leaderboard" aria-labelledby="leaderboard-title">
@@ -109,6 +117,31 @@
           <p id="progress-empty" class="progress-empty">Complete a round to begin tracking progress.</p>
           <button id="export-progress" class="text-button" type="button">Download CSV</button>
         </details>
+      </section>
+
+      <section id="chart-screen" class="card learn-screen" hidden>
+        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Multiplication chart</h2></div><button id="chart-home" class="text-button" type="button">Back home</button></div>
+        <p class="learn-note">Tap a number to highlight its row and column.</p>
+        <div id="chart-wrap" class="chart-wrap"></div>
+      </section>
+
+      <section id="cards-screen" class="card learn-screen" hidden>
+        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Five-minute study cards</h2></div><button id="cards-home" class="text-button" type="button">Back home</button></div>
+        <div id="card-setup">
+          <p class="learn-note">Choose one or more tables. Every card shows the problem and answer.</p>
+          <div class="table-select-actions"><button id="select-all-tables" class="text-button" type="button">Select all</button><button id="clear-tables" class="text-button" type="button">Clear all</button></div>
+          <div id="table-checkboxes" class="table-checkboxes"></div>
+          <p id="cards-error" class="field-error" role="alert"></p>
+          <button id="start-cards" class="primary-button" type="button">Start 5-minute study</button>
+        </div>
+        <div id="card-session" hidden>
+          <p id="card-progress" class="card-progress"></p><div id="study-card" class="study-card" aria-live="polite"></div>
+          <div class="card-actions"><button id="previous-card" class="secondary-button" type="button">Previous</button><button id="next-card" class="primary-button" type="button">Next card</button></div>
+        </div>
+        <div id="card-complete" class="card-complete" hidden>
+          <div class="celebration" aria-hidden="true">★</div><h2>Study complete!</h2><p>Great focus—five minutes of review makes every fact easier to remember.</p>
+          <button id="restart-cards" class="primary-button" type="button">Study again</button>
+        </div>
       </section>
 
       <section id="quiz-screen" class="card quiz-screen" hidden>
@@ -154,6 +187,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=16"></script>
+    <script src="app-v8.js?v=17"></script>
   </body>
 </html>

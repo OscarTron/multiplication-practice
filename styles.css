@@ -137,6 +137,29 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
 .sound-setting { display: flex; flex-direction: column; justify-content: flex-end; }
 .sound-control { display: flex; min-height: var(--control-height); align-items: center; gap: 8px; padding: 0 12px; border: 2px solid var(--line); border-radius: 12px; background: white; color: var(--navy); font-size: var(--text-small); font-weight: 600; }
 .sound-control input { width: 20px; height: 20px; margin: 0; accent-color: var(--teal); }
+
+.learn-panel { width: 100%; max-width: var(--content-width); margin: var(--space-4) auto 0; padding: var(--space-4); border: 2px solid var(--line); border-radius: 16px; background: var(--cream); text-align: left; }
+.learn-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.learn-actions button { width: 100%; min-height: var(--control-height); box-shadow: none; }
+.learn-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.learn-header h2 { margin: 0; }
+.learn-note { color: var(--muted); line-height: 1.5; }
+.chart-wrap { overflow-x: auto; padding-bottom: 6px; }
+.multiplication-chart { width: 100%; min-width: 560px; border-collapse: separate; border-spacing: 3px; text-align: center; }
+.multiplication-chart th, .multiplication-chart td { min-width: 36px; height: 36px; padding: 4px; border-radius: 8px; background: var(--cream); font-size: .8rem; font-weight: 700; cursor: pointer; }
+.multiplication-chart th { color: white; background: var(--teal-dark); }
+.multiplication-chart .chart-highlight { color: var(--navy); background: var(--yellow); }
+.table-select-actions { display: flex; gap: 10px; margin-bottom: 12px; }
+.table-checkboxes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-bottom: 18px; }
+.table-checkboxes label { display: flex; min-height: 44px; align-items: center; justify-content: center; border: 2px solid var(--line); border-radius: 12px; background: var(--cream); font-weight: 800; cursor: pointer; }
+.table-checkboxes input { width: 18px; height: 18px; accent-color: var(--teal); }
+.study-card { display: grid; min-height: 250px; place-content: center; gap: 14px; border: 3px solid var(--navy); border-radius: 24px; background: linear-gradient(145deg, #fff, var(--teal-soft)); box-shadow: 0 8px 0 var(--navy); text-align: center; }
+.study-card span { font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 800; }
+.study-card strong { color: var(--teal-dark); font-size: clamp(2.3rem, 9vw, 4rem); }
+.card-progress { color: var(--muted); font-size: var(--text-small); font-weight: 800; text-align: center; }
+.card-actions { display: flex; justify-content: center; gap: 14px; margin-top: 24px; }
+.card-actions button { width: min(100%, 220px); }
+.card-complete { padding: var(--space-4) 0; text-align: center; }
 .settings-description { margin: 0 var(--space-3) var(--space-3); color: var(--muted); font-size: var(--text-small); font-weight: 500; line-height: 1.45; }
 .records { display: grid; width: 100%; max-width: var(--content-width); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin: var(--space-4) auto; }
 .record { display: grid; min-width: 0; min-height: 92px; padding: 14px 8px; align-content: center; border: 2px solid var(--line); border-radius: 16px; background: var(--cream); }
@@ -280,6 +303,9 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
   .card { border-radius: 22px; }
   .start-heading { align-items: flex-start; flex-direction: column; gap: 9px; }
   .records { gap: 7px; }
+  .learn-actions { grid-template-columns: 1fr; }
+  .learn-header { align-items: stretch; flex-direction: column; }
+  .table-checkboxes { grid-template-columns: repeat(3, 1fr); }
   .settings-grid { grid-template-columns: 1fr; }
   .settings-panel summary { align-items: center; }
   .settings-panel summary strong { max-width: 130px; }

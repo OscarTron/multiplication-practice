@@ -13,6 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- A Learn section with an interactive multiplication chart and five-minute multi-table study cards.
+- A five-minute Student practice option.
 - A Student practice-time setting with 10, 20, and 30-minute options.
 - Home navigation from the results screen.
 - Per-player round history with an on-screen progress table and CSV download.

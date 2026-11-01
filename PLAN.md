@@ -29,7 +29,9 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [ ] Track lifetime accuracy by multiplication fact.
 - [x] Add focused practice by table while keeping mixed practice as the default.
 - [x] Make 0–10 the standard range with an optional 0–12 extension.
-- [x] Add Practice, Challenge, and Speed levels with separate records.
+- [x] Add Student, Scholar, and Prodigy levels with separate records.
+- [x] Rename the levels Student, Scholar, and Prodigy.
+- [x] Add correct and incorrect feedback effects with optional sound.
 - [ ] Add a simple 30-minute daily-practice indicator.
 
 ## Phase 3 — Motivation and progress

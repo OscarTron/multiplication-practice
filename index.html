@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=9" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -26,7 +26,7 @@
       </header>
 
       <section id="start-screen" class="card start-screen">
-        <p id="round-label" class="round-label">Level 1 · 20 questions · 10 minutes</p>
+        <p id="round-label" class="round-label">Student · 20 questions · 10 minutes</p>
         <h2>Accuracy first. Speed comes next.</h2>
         <p>Answers stay hidden until the round is complete. Reach 100%, then try to beat your fastest time.</p>
         <div class="player-panel">
@@ -38,15 +38,15 @@
         <details class="settings-panel">
           <summary>
             <span>Practice settings</span>
-            <strong id="settings-summary">Level 1 · 0–10 · Mixed</strong>
+            <strong id="settings-summary">Student · 0–10 · Mixed</strong>
           </summary>
           <div class="settings-grid">
             <label>
               <span>Level</span>
               <select id="level-select">
-                <option value="1">Level 1 · Practice</option>
-                <option value="2">Level 2 · Challenge</option>
-                <option value="3">Level 3 · Speed</option>
+                <option value="1">Student · Level 1</option>
+                <option value="2">Scholar · Level 2</option>
+                <option value="3">Prodigy · Level 3</option>
               </select>
             </label>
             <label>
@@ -59,6 +59,10 @@
             <label>
               <span>Table filter</span>
               <select id="focus-select"></select>
+            </label>
+            <label class="sound-setting">
+              <span>Sound effects</span>
+              <span class="sound-control"><input id="sound-toggle" type="checkbox" /> <span>Play feedback tones</span></span>
             </label>
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
@@ -94,6 +98,7 @@
             <span class="factor-bottom"><span class="multiply-sign">×</span><span id="factor-bottom">8</span></span>
           </h2>
           <div id="choices" class="choices" aria-label="Answer choices"></div>
+          <div id="answer-feedback" class="answer-feedback" role="status" aria-live="polite"></div>
         </div>
         <p id="quiz-note" class="quiz-note">Choose your best answer. Results appear at the end.</p>
       </section>
@@ -113,6 +118,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js"></script>
+    <script src="app-v8.js?v=9"></script>
   </body>
 </html>

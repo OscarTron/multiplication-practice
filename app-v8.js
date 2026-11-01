@@ -3,9 +3,9 @@
 
   const STORE = "multiplication-practice-records-v1";
   const LEVELS = {
-    1: { name: "Practice", count: 20, seconds: 600, text: "20 questions with a relaxed 10-minute timer." },
-    2: { name: "Challenge", count: 30, seconds: 120, text: "30 questions in 2 minutes. Finish accurately before time runs out." },
-    3: { name: "Speed", count: null, seconds: 120, text: "Answer as many questions as you can in 2 minutes." },
+    1: { name: "Student", count: 20, seconds: 600, text: "Student: 20 questions with a relaxed 10-minute timer." },
+    2: { name: "Scholar", count: 30, seconds: 120, text: "Scholar: 30 questions in 2 minutes. Finish accurately before time runs out." },
+    3: { name: "Prodigy", count: null, seconds: 120, text: "Prodigy: answer as many questions as you can in 2 minutes." },
   };
   const DEFAULTS = { level: 1, range: 10, focus: "all" };
   const $ = (selector) => document.querySelector(selector);
@@ -14,19 +14,20 @@
     startButton: $("#start-button"), retryButton: $("#retry-button"), timer: $("#timer"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
     playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
-    range: $("#range-select"), focus: $("#focus-select"), settingsSummary: $("#settings-summary"),
+    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
     levelDescription: $("#level-description"), leaderboard: $("#leaderboard-list"),
     leaderboardRule: $("#leaderboard-rule"), stripAnswered: $("#strip-answered"),
     stripRemaining: $("#strip-remaining"), stripReview: $("#strip-review"),
     progressText: $("#progress-text"), answeredText: $("#answered-text"), progressBar: $("#progress-bar"),
-    question: $("#question"), factorTop: $("#factor-top"), factorBottom: $("#factor-bottom"),
+    questionArea: $(".question-area"), question: $("#question"), factorTop: $("#factor-top"), factorBottom: $("#factor-bottom"),
     choices: $("#choices"), quizNote: $("#quiz-note"), resultHeading: $("#result-heading"),
     score: $("#score"), correctCount: $("#correct-count"), elapsedTime: $("#elapsed-time"),
-    resultMessage: $("#result-message"), corrections: $("#corrections"),
+    answerFeedback: $("#answer-feedback"), resultMessage: $("#result-message"), corrections: $("#corrections"),
   };
 
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
+  let audioContext = null;
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
   function cleanRecords(value) {
@@ -69,11 +70,12 @@
       });
       const oldFields = ["bestScore", "fastestPerfect", "missedFacts", "roundsCompleted"];
       return {
-        version: 3, players, currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
+        version: 4, players, currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
         settings: cleanSettings(saved.settings),
+        sound: saved.sound === true,
         legacy: saved.legacy || (oldFields.some((field) => Object.hasOwn(saved, field)) ? cleanRecords(saved) : null),
       };
-    } catch { return { version: 3, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, legacy: null }; }
+    } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, legacy: null }; }
   }
   const save = (state) => localStorage.setItem(STORE, JSON.stringify(state));
   const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value });
@@ -133,7 +135,7 @@
   }
 
   function formatTime(seconds) { return `${Math.floor(Math.max(0, seconds) / 60)}:${String(Math.max(0, seconds) % 60).padStart(2, "0")}`; }
-  function settingsName(settings) { return `Level ${settings.level} · 0–${settings.range} · ${settings.focus === "all" ? "Mixed" : `×${settings.focus} only`}`; }
+  function settingsName(settings) { return `${LEVELS[settings.level].name} · 0–${settings.range} · ${settings.focus === "all" ? "Mixed" : `×${settings.focus} only`}`; }
   function fillFocus(range, selected = "all") {
     el.focus.replaceChildren();
     const all = document.createElement("option"); all.value = "all"; all.textContent = "All tables · Mixed"; el.focus.append(all);
@@ -146,8 +148,8 @@
     const settings = settingsFromUI(), level = LEVELS[settings.level];
     el.settingsSummary.textContent = settingsName(settings);
     el.levelDescription.textContent = level.text;
-    el.roundLabel.textContent = settings.level === 1 ? "Level 1 · 20 questions · 10 minutes"
-      : settings.level === 2 ? "Level 2 · 30 questions · 2 minutes" : "Level 3 · 2-minute speed round";
+    el.roundLabel.textContent = settings.level === 1 ? "Student · 20 questions · 10 minutes"
+      : settings.level === 2 ? "Scholar · 30 questions · 2 minutes" : "Prodigy · 2-minute speed round";
     el.leaderboardRule.textContent = settings.level === 3 ? "Accuracy · then correct" : "100% rounds only";
   }
   function showRecords() {
@@ -184,7 +186,27 @@
   }
   function refresh() {
     showSettings(); showRecords(); showPlayers();
-    const state = load(); state.settings = settingsFromUI(); save(state);
+    const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
+  }
+
+  function playTone(isCorrect) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!el.sound.checked || !AudioContextClass) return;
+    try {
+      audioContext ||= new AudioContextClass();
+      const now = audioContext.currentTime;
+      const frequencies = isCorrect ? [523, 659] : [220, 185];
+      frequencies.forEach((frequency, note) => {
+        const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
+        oscillator.type = isCorrect ? "sine" : "triangle";
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.0001, now + note * 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.045, now + note * 0.09 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + note * 0.09 + 0.13);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start(now + note * 0.09); oscillator.stop(now + note * 0.09 + 0.14);
+      });
+    } catch { /* Visual feedback remains available if audio is blocked. */ }
   }
   function screen(name) { el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results"; }
   function updateTimer() {
@@ -196,6 +218,7 @@
   function render() {
     const level = LEVELS[activeSettings.level], item = questions[index], renderedIndex = index;
     clearTimeout(unlockId);
+    el.questionArea.classList.remove("feedback-correct", "feedback-incorrect"); el.answerFeedback.textContent = "";
     el.progressText.textContent = level.count ? `Question ${index + 1} of ${level.count}` : `Question ${index + 1}`;
     el.answeredText.textContent = `${answers.length} answered`;
     if (level.count) el.progressBar.style.width = `${answers.length / level.count * 100}%`;
@@ -203,23 +226,30 @@
     el.factorTop.textContent = item.left; el.factorBottom.textContent = item.right; el.question.setAttribute("aria-label", `${item.left} times ${item.right}`); el.choices.replaceChildren();
     item.choices.forEach((choice) => {
       const button = document.createElement("button"); button.type = "button"; button.className = "choice"; button.textContent = choice;
-      button.setAttribute("aria-label", `Answer ${choice}`); button.disabled = locked; button.addEventListener("click", () => answer(choice, renderedIndex)); el.choices.append(button);
+      button.setAttribute("aria-label", `Answer ${choice}`); button.disabled = locked; button.addEventListener("click", () => answer(choice, renderedIndex, button)); el.choices.append(button);
     });
-    if (locked) unlockId = setTimeout(() => {
-      if (index !== renderedIndex) return; locked = false; el.choices.querySelectorAll("button").forEach((button) => { button.disabled = false; }); el.choices.querySelector("button")?.focus();
-    }, 350); else el.choices.querySelector("button")?.focus();
+    el.choices.querySelector("button")?.focus();
   }
-  function answer(choice, renderedIndex) {
+  function answer(choice, renderedIndex, selectedButton) {
     if (locked || renderedIndex !== index) return;
     locked = true; el.choices.querySelectorAll("button").forEach((button) => { button.disabled = true; });
-    const item = questions[index]; answers.push({ ...item, selected: choice, isCorrect: choice === item.correct }); index += 1;
-    const count = LEVELS[activeSettings.level].count; if (count && index >= count) finish(false); else render();
+    const item = questions[index], isCorrect = choice === item.correct;
+    selectedButton.classList.add(isCorrect ? "selected-correct" : "selected-incorrect");
+    el.questionArea.classList.add(isCorrect ? "feedback-correct" : "feedback-incorrect");
+    el.answerFeedback.textContent = isCorrect ? "Nice!" : "Keep going!";
+    playTone(isCorrect);
+    answers.push({ ...item, selected: choice, isCorrect });
+    unlockId = setTimeout(() => {
+      index += 1; locked = false;
+      const count = LEVELS[activeSettings.level].count;
+      if (count && index >= count) finish(false); else render();
+    }, 480);
   }
   function choosePlayer() {
     const displayName = cleanName(el.playerName.value);
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
-    state.players[key] ||= { displayName, recordsByMode: {} }; state.currentPlayer = key; state.settings = settingsFromUI(); save(state);
+    state.players[key] ||= { displayName, recordsByMode: {} }; state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
   function start(select = false) {
@@ -266,10 +296,10 @@
   el.startButton.addEventListener("click", () => start(true)); el.retryButton.addEventListener("click", () => start(false));
   el.playerName.addEventListener("input", () => { el.playerError.textContent = ""; showRecords(); });
   el.playerName.addEventListener("keydown", (event) => { if (event.key === "Enter") start(true); });
-  el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh);
+  el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
   el.range.addEventListener("change", () => { fillFocus(Number(el.range.value), el.focus.value); refresh(); });
 
-  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; fillFocus(initial.settings.range, initial.settings.focus);
+  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
   if (initial.players[initial.currentPlayer]) el.playerName.value = initial.players[initial.currentPlayer].displayName;
   refresh();
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("service-worker.js").catch(() => {});

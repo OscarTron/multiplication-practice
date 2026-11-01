@@ -6,9 +6,9 @@ It is designed for short, repeatable practice without accounts, advertising, tra
 
 ## Practice rules
 
-- Each round contains 20 randomized questions.
+- Level 1 contains 20 questions, Level 2 contains 30, and Level 3 continues until time expires.
 - Each question has three answer choices.
-- The round lasts up to 10 minutes.
+- Level 1 lasts up to 10 minutes; Levels 2 and 3 last 2 minutes.
 - Results and corrections appear only after the round.
 - Missed facts return in later rounds for extra practice.
 - The goal is 100% accuracy, followed by a faster personal-best time.

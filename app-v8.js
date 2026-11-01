@@ -24,7 +24,7 @@
     choices: $("#choices"), quizNote: $("#quiz-note"), resultHeading: $("#result-heading"),
     score: $("#score"), correctCount: $("#correct-count"), elapsedTime: $("#elapsed-time"),
     answerFeedback: $("#answer-feedback"), resultMessage: $("#result-message"), corrections: $("#corrections"),
-    progressBody: $("#progress-body"), progressEmpty: $("#progress-empty"), exportProgress: $("#export-progress"),
+    progressBody: $("#progress-body"), progressEmpty: $("#progress-empty"), exportProgress: $("#export-progress"), recentSummary: $("#recent-summary"),
     chart: $("#chart-screen"), cards: $("#cards-screen"), openChart: $("#open-chart"), openCards: $("#open-cards"), chartHome: $("#chart-home"), cardsHome: $("#cards-home"),
     chartWrap: $("#chart-wrap"), tableCheckboxes: $("#table-checkboxes"), selectAllTables: $("#select-all-tables"), clearTables: $("#clear-tables"),
     startCards: $("#start-cards"), cardsError: $("#cards-error"), cardSetup: $("#card-setup"), cardSession: $("#card-session"), cardComplete: $("#card-complete"),
@@ -155,9 +155,9 @@
   }
   function fillFocus(range, selected = "all") {
     el.focus.replaceChildren();
-    const all = document.createElement("option"); all.value = "all"; all.textContent = "All tables · Mixed"; el.focus.append(all);
+    const all = document.createElement("option"); all.value = "all"; all.textContent = "All Tables · Mixed"; el.focus.append(all);
     for (let number = 0; number <= range; number += 1) {
-      const option = document.createElement("option"); option.value = number; option.textContent = `×${number} table only`; el.focus.append(option);
+      const option = document.createElement("option"); option.value = number; option.textContent = `×${number} Table Only`; el.focus.append(option);
     }
     el.focus.value = Number(selected) <= range ? selected : "all";
   }
@@ -168,14 +168,14 @@
     el.levelDescription.textContent = settings.level === 1 ? `Student: 20 questions with a ${settings.practiceMinutes}-minute timer.` : level.text;
     el.roundLabel.textContent = settings.level === 1 ? `Student · 20 questions · ${settings.practiceMinutes} minutes`
       : settings.level === 2 ? "Scholar · 30 questions · 2 minutes" : "Prodigy · 2-minute speed round";
-    el.leaderboardRule.textContent = settings.level === 3 ? "Accuracy · then correct" : "100% rounds only";
+    el.leaderboardRule.textContent = settings.level === 3 ? "Accuracy · Then Correct" : "100% Rounds Only";
   }
   function showRecords() {
     const settings = settingsFromUI(), records = recordsFor(playerKey(el.playerName.value), settings);
     const repeats = Object.values(records.missedFacts).filter((weight) => weight > 0).length;
     el.records.innerHTML = settings.level === 3
-      ? `<div class="record"><strong>${records.bestScore}%</strong><span>Best accuracy</span></div><div class="record"><strong>${records.bestCorrect}</strong><span>Most correct</span></div><div class="record"><strong>${repeats}</strong><span>Repeats next round</span></div>`
-      : `<div class="record"><strong>${records.bestScore}%</strong><span>Best score</span></div><div class="record"><strong>${records.fastestPerfect === null ? "—" : formatTime(records.fastestPerfect)}</strong><span>Fastest 100%</span></div><div class="record"><strong>${repeats}</strong><span>Repeats next round</span></div>`;
+      ? `<div class="record"><strong>${records.bestScore}%</strong><span>Best Accuracy</span></div><div class="record"><strong>${records.bestCorrect}</strong><span>Most Correct</span></div><div class="record"><strong>${repeats}</strong><span>Repeats Next Round</span></div>`
+      : `<div class="record"><strong>${records.bestScore}%</strong><span>Best Score</span></div><div class="record"><strong>${records.fastestPerfect === null ? "—" : formatTime(records.fastestPerfect)}</strong><span>Fastest 100%</span></div><div class="record"><strong>${repeats}</strong><span>Repeats Next Round</span></div>`;
   }
   function showPlayers() {
     const state = load(), settings = settingsFromUI(), key = modeKey(settings);
@@ -205,6 +205,16 @@
   function showProgress() {
     const player = load().players[playerKey(el.playerName.value)];
     const history = player && Array.isArray(player.history) ? player.history.slice(-20).reverse() : [];
+    const recent = history.slice(0, 5).reverse();
+    if (!recent.length) {
+      el.recentSummary.innerHTML = '<p class="recent-empty">Complete a round to see recent improvement.</p>';
+    } else {
+      const average = Math.round(recent.reduce((total, round) => total + Number(round.score || 0), 0) / recent.length);
+      const change = recent.length > 1 ? Number(recent[recent.length - 1].score || 0) - Number(recent[0].score || 0) : null;
+      const perfectTimes = recent.filter((round) => Number(round.score) === 100 && Number.isFinite(Number(round.elapsed))).map((round) => Number(round.elapsed));
+      const changeValue = change === null ? "—" : `${change > 0 ? "+" : ""}${change} pts`;
+      el.recentSummary.innerHTML = `<div><strong>${average}%</strong><span>Average Score</span></div><div><strong>${changeValue}</strong><span>Score Change</span></div><div><strong>${perfectTimes.length ? formatTime(Math.min(...perfectTimes)) : "—"}</strong><span>Best Perfect Time</span></div>`;
+    }
     el.progressBody.replaceChildren();
     history.forEach((round) => {
       const row = document.createElement("tr");
@@ -321,7 +331,7 @@
     clearTimeout(unlockId);
     el.questionArea.classList.remove("feedback-correct", "feedback-incorrect"); el.answerFeedback.textContent = "";
     el.progressText.textContent = level.count ? `Question ${index + 1} of ${level.count}` : `Question ${index + 1}`;
-    el.answeredText.textContent = `${answers.length} answered`;
+    el.answeredText.textContent = `${answers.length} Answered`;
     if (level.count) el.progressBar.style.width = `${answers.length / level.count * 100}%`;
     el.stripAnswered.textContent = answers.length; el.stripRemaining.textContent = level.count ? level.count - answers.length : "∞"; el.stripReview.textContent = reviewCount;
     el.factorTop.textContent = item.left; el.factorBottom.textContent = item.right; el.question.setAttribute("aria-label", `${item.left} times ${item.right}`); el.choices.replaceChildren();
@@ -390,14 +400,14 @@
     const missed = answers.filter((item) => !item.isCorrect);
     if (!missed.length) { el.corrections.innerHTML = '<p class="correct-message">Perfect round—every answer was correct!</p>'; return; }
     const rows = missed.map((item) => `<li><span>${item.left} × ${item.right}</span><span>You chose <strong>${item.selected}</strong> · Answer <strong>${item.correct}</strong></span></li>`).join("");
-    el.corrections.innerHTML = `<h3>Practice these again</h3><ul class="correction-list">${rows}</ul>`;
+    el.corrections.innerHTML = `<h3>Practice These Again</h3><ul class="correction-list">${rows}</ul>`;
   }
   function finish(timedOut) {
     clearInterval(timerId); timerId = null; clearTimeout(unlockId); el.timerPanel.hidden = true;
     const level = LEVELS[activeSettings.level], elapsed = Math.min(timerSeconds(activeSettings), Math.floor((Date.now() - startedAt) / 1000));
     const correct = answers.filter((item) => item.isCorrect).length, score = answers.length ? Math.round(correct / answers.length * 100) : 0;
     el.score.textContent = `${score}%`; el.correctCount.textContent = `${correct}/${activeSettings.level === 3 ? answers.length : level.count}`; el.elapsedTime.textContent = formatTime(elapsed);
-    el.resultHeading.textContent = score === 100 && answers.length ? "Perfect accuracy!" : "Round complete!";
+    el.resultHeading.textContent = score === 100 && answers.length ? "Perfect Accuracy!" : "Round Complete!";
     el.resultMessage.textContent = activeSettings.level === 3 ? `You answered ${answers.length} questions and got ${correct} correct. Keep accuracy high as your total grows.`
       : timedOut ? `Time is up! You answered ${answers.length} of ${level.count} questions. Great effort—every round makes you stronger.`
         : score === 100 ? "Excellent work. Try again when you are ready to improve your time." : "Good practice. Practice the missed problems, then try another round.";

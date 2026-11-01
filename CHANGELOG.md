@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- A compact recent-progress summary with five-round average, score change, and best perfect time.
 - A Learn section with an interactive multiplication chart and five-minute multi-table flashcards.
 - A five-minute Student practice option.
 - A Student practice-time setting with 10, 20, and 30-minute options.
@@ -33,6 +34,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Standardized headings, buttons, settings, and compact labels using consistent title capitalization.
 - Standardized key home-screen labels in title case and renamed Study Cards to Flash Cards.
 - Reordered the home screen around Start Practice and grouped records, leaderboard, and history under My Progress.
 - Standardized primary and secondary controls and fitted the complete multiplication chart on mobile.

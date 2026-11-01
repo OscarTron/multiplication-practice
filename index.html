@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=22" />
+    <link rel="stylesheet" href="styles.css?v=23" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -20,7 +20,7 @@
           </div>
         </div>
         <div id="timer-panel" class="timer" aria-live="polite" hidden>
-          <span>Time left</span>
+          <span>Time Left</span>
           <strong id="timer">10:00</strong>
         </div>
       </header>
@@ -50,48 +50,48 @@
               </select>
             </label>
             <label>
-              <span>Number range</span>
+              <span>Number Range</span>
               <select id="range-select">
                 <option value="10">0–10 · Standard</option>
                 <option value="12">0–12 · Extended</option>
               </select>
             </label>
             <label id="practice-time-setting">
-              <span>Practice time</span>
+              <span>Practice Time</span>
               <select id="practice-time-select">
-                <option value="5">5 minutes</option>
-                <option value="10">10 minutes</option>
-                <option value="20">20 minutes</option>
-                <option value="30">30 minutes</option>
+                <option value="5">5 Minutes</option>
+                <option value="10">10 Minutes</option>
+                <option value="20">20 Minutes</option>
+                <option value="30">30 Minutes</option>
               </select>
             </label>
             <label>
-              <span>Table filter</span>
+              <span>Table Filter</span>
               <select id="focus-select">
-                <option value="all">All tables · Mixed</option>
-                <option value="0">×0 table only</option>
-                <option value="1">×1 table only</option>
-                <option value="2">×2 table only</option>
-                <option value="3">×3 table only</option>
-                <option value="4">×4 table only</option>
-                <option value="5">×5 table only</option>
-                <option value="6">×6 table only</option>
-                <option value="7">×7 table only</option>
-                <option value="8">×8 table only</option>
-                <option value="9">×9 table only</option>
-                <option value="10">×10 table only</option>
+                <option value="all">All Tables · Mixed</option>
+                <option value="0">×0 Table Only</option>
+                <option value="1">×1 Table Only</option>
+                <option value="2">×2 Table Only</option>
+                <option value="3">×3 Table Only</option>
+                <option value="4">×4 Table Only</option>
+                <option value="5">×5 Table Only</option>
+                <option value="6">×6 Table Only</option>
+                <option value="7">×7 Table Only</option>
+                <option value="8">×8 Table Only</option>
+                <option value="9">×9 Table Only</option>
+                <option value="10">×10 Table Only</option>
               </select>
             </label>
             <label class="sound-setting">
-              <span>Sound effects</span>
-              <span class="sound-control"><input id="sound-toggle" type="checkbox" /> <span>Play feedback tones</span></span>
+              <span>Sound Effects</span>
+              <span class="sound-control"><input id="sound-toggle" type="checkbox" /> <span>Play Feedback Tones</span></span>
             </label>
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
         </details>
         <button id="start-button" class="primary-button" type="button">Start Practice</button>
         <section class="learn-panel" aria-labelledby="learn-title">
-          <div class="section-heading"><h3 id="learn-title">Learn</h3><span>Review before testing</span></div>
+          <div class="section-heading"><h3 id="learn-title">Learn</h3><span>Review Before Testing</span></div>
           <div class="learn-actions">
             <button id="open-chart" class="secondary-button" type="button">Review Chart</button>
             <button id="open-cards" class="secondary-button" type="button">Flash Cards</button>
@@ -100,16 +100,23 @@
         <details class="progress-panel my-progress-panel">
           <summary>My Progress</summary>
           <div class="my-progress-content">
-            <div id="records" class="records" aria-label="Personal records"></div>
+            <div id="records" class="records" aria-label="Personal Records"></div>
+            <section class="recent-progress" aria-labelledby="recent-progress-title">
+              <div class="section-heading">
+                <h3 id="recent-progress-title">Recent Progress</h3>
+                <span>Last 5 Rounds</span>
+              </div>
+              <div id="recent-summary" class="recent-summary"></div>
+            </section>
             <section class="leaderboard" aria-labelledby="leaderboard-title">
               <div class="section-heading">
-                <h3 id="leaderboard-title">Family leaderboard</h3>
-                <span id="leaderboard-rule">100% rounds only</span>
+                <h3 id="leaderboard-title">Family Leaderboard</h3>
+                <span id="leaderboard-rule">100% Rounds Only</span>
               </div>
               <ol id="leaderboard-list" class="leaderboard-list"></ol>
             </section>
             <section class="progress-data-section" aria-labelledby="progress-data-title">
-              <h3 id="progress-data-title">Round history</h3>
+              <h3 id="progress-data-title">Round History</h3>
               <div class="progress-table-wrap">
                 <table class="progress-table">
                   <thead><tr><th>Date</th><th>Mode</th><th>Score</th><th>Correct</th><th>Time</th></tr></thead>
@@ -124,7 +131,7 @@
       </section>
 
       <section id="chart-screen" class="card learn-screen" hidden>
-        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Multiplication chart</h2></div><button id="chart-home" class="secondary-button" type="button">Home</button></div>
+        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Multiplication Chart</h2></div><button id="chart-home" class="secondary-button" type="button">Home</button></div>
         <p class="learn-note">Tap a number to highlight its row and column. Swipe sideways on smaller screens.</p>
         <div id="chart-wrap" class="chart-wrap"></div>
       </section>
@@ -133,18 +140,18 @@
         <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>5 Minute Flashcards</h2></div><button id="cards-home" class="secondary-button" type="button">Home</button></div>
         <div id="card-setup">
           <p class="learn-note">Choose one or more tables. Every card shows the problem and answer.</p>
-          <div class="table-select-actions"><button id="select-all-tables" class="text-button" type="button">Select all</button><button id="clear-tables" class="text-button" type="button">Clear all</button></div>
+          <div class="table-select-actions"><button id="select-all-tables" class="text-button" type="button">Select All</button><button id="clear-tables" class="text-button" type="button">Clear All</button></div>
           <div id="table-checkboxes" class="table-checkboxes"></div>
           <p id="cards-error" class="field-error" role="alert"></p>
-          <button id="start-cards" class="primary-button" type="button">Start 5-minute study</button>
+          <button id="start-cards" class="primary-button" type="button">Start 5-Minute Study</button>
         </div>
         <div id="card-session" hidden>
           <p id="card-progress" class="card-progress"></p><div id="study-card" class="study-card" aria-live="polite"></div>
-          <div class="card-actions"><button id="previous-card" class="secondary-button" type="button">Previous</button><button id="next-card" class="primary-button" type="button">Next card</button></div>
+          <div class="card-actions"><button id="previous-card" class="secondary-button" type="button">Previous</button><button id="next-card" class="primary-button" type="button">Next Card</button></div>
         </div>
         <div id="card-complete" class="card-complete" hidden>
-          <div class="celebration" aria-hidden="true">★</div><h2>Study complete!</h2><p>Great focus—five minutes of review makes every fact easier to remember.</p>
-          <button id="restart-cards" class="primary-button" type="button">Study again</button>
+          <div class="celebration" aria-hidden="true">★</div><h2>Study Complete!</h2><p>Great focus—five minutes of review makes every fact easier to remember.</p>
+          <button id="restart-cards" class="primary-button" type="button">Study Again</button>
         </div>
       </section>
 
@@ -156,7 +163,7 @@
         </div>
         <div class="progress-row">
           <span id="progress-text">Question 1 of 20</span>
-          <span id="answered-text">0 answered</span>
+          <span id="answered-text">0 Answered</span>
         </div>
         <div class="progress-track" aria-hidden="true">
           <div id="progress-bar" class="progress-bar"></div>
@@ -176,7 +183,7 @@
       <section id="results-screen" class="card results-screen" hidden>
         <div class="celebration" aria-hidden="true">★</div>
         <p class="round-label">ROUND COMPLETE</p>
-        <h2 id="result-heading">Great effort!</h2>
+        <h2 id="result-heading">Great Effort!</h2>
         <div class="result-grid">
           <div><strong id="score">0%</strong><span>Score</span></div>
           <div><strong id="correct-count">0/20</strong><span>Correct</span></div>
@@ -186,11 +193,11 @@
         <div id="corrections" class="corrections"></div>
         <div class="result-actions">
           <button id="home-button" class="secondary-button" type="button">Home</button>
-          <button id="retry-button" class="primary-button" type="button">Try another round</button>
+          <button id="retry-button" class="primary-button" type="button">Try Another Round</button>
         </div>
       </section>
     </main>
 
-    <script src="app-v8.js?v=22"></script>
+    <script src="app-v8.js?v=23"></script>
   </body>
 </html>

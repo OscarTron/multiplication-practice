@@ -32,6 +32,8 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 
 ## Phase 3 — Motivation and progress
 
+- [x] Add player names with separate on-device practice records.
+- [x] Add a local family leaderboard for fastest perfect rounds.
 - [ ] Add optional streaks and achievement badges.
 - [ ] Add a private, on-device progress chart.
 - [ ] Add parent-controlled reset and data export.

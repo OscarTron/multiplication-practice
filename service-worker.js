@@ -1,4 +1,4 @@
-const CACHE_NAME = "multiplication-practice-v5";
+const CACHE_NAME = "multiplication-practice-v6";
 const APP_FILES = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

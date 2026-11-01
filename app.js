@@ -13,6 +13,10 @@
     retryButton: document.querySelector("#retry-button"),
     timer: document.querySelector("#timer"),
     records: document.querySelector("#records"),
+    playerName: document.querySelector("#player-name"),
+    playerList: document.querySelector("#player-list"),
+    playerError: document.querySelector("#player-error"),
+    leaderboardList: document.querySelector("#leaderboard-list"),
     stripAnswered: document.querySelector("#strip-answered"),
     stripRemaining: document.querySelector("#strip-remaining"),
     stripReview: document.querySelector("#strip-review"),
@@ -39,6 +43,62 @@
   let unlockTimerId = null;
   let reviewFactsInRound = 0;
   let answerLocked = false;
+  let activePlayerKey = "";
+
+  function emptyRecords() {
+    return { bestScore: 0, fastestPerfect: null, missedFacts: {}, roundsCompleted: 0 };
+  }
+
+  function normalizeRecords(value) {
+    const saved = value && typeof value === "object" ? value : {};
+    return {
+      bestScore: Number.isFinite(saved.bestScore) ? saved.bestScore : 0,
+      fastestPerfect: Number.isFinite(saved.fastestPerfect) ? saved.fastestPerfect : null,
+      missedFacts: saved.missedFacts && typeof saved.missedFacts === "object" ? saved.missedFacts : {},
+      roundsCompleted: Number.isFinite(saved.roundsCompleted) ? saved.roundsCompleted : 0,
+    };
+  }
+
+  function normalizePlayerName(value) {
+    return value.trim().replace(/\s+/g, " ").slice(0, 16);
+  }
+
+  function playerKey(name) {
+    return normalizePlayerName(name).toLocaleLowerCase();
+  }
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      const players = {};
+      if (saved.players && typeof saved.players === "object") {
+        Object.entries(saved.players).forEach(([key, player]) => {
+          if (!player || typeof player !== "object") return;
+          const displayName = normalizePlayerName(player.displayName || key);
+          if (!displayName) return;
+          players[playerKey(displayName)] = { displayName, ...normalizeRecords(player) };
+        });
+      }
+      const hasLegacyRecords = ["bestScore", "fastestPerfect", "missedFacts", "roundsCompleted"]
+        .some((field) => Object.hasOwn(saved, field));
+      return {
+        version: 2,
+        currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
+        players,
+        legacy: saved.legacy || (hasLegacyRecords ? normalizeRecords(saved) : null),
+      };
+    } catch {
+      return { version: 2, currentPlayer: "", players: {}, legacy: null };
+    }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function getPlayerRecords(key = activePlayerKey) {
+    return loadState().players[key] || emptyRecords();
+  }
 
   function shuffle(items) {
     const copy = [...items];
@@ -80,7 +140,7 @@
       }
     }
 
-    const records = loadRecords();
+    const records = getPlayerRecords();
     const reviewFacts = Object.entries(records.missedFacts)
       .filter(([, weight]) => Number.isFinite(weight) && weight > 0)
       .sort(([, firstWeight], [, secondWeight]) => secondWeight - firstWeight)
@@ -114,28 +174,55 @@
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
   }
 
-  function loadRecords() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-      return {
-        bestScore: Number.isFinite(saved.bestScore) ? saved.bestScore : 0,
-        fastestPerfect: Number.isFinite(saved.fastestPerfect) ? saved.fastestPerfect : null,
-        missedFacts: saved.missedFacts && typeof saved.missedFacts === "object" ? saved.missedFacts : {},
-        roundsCompleted: Number.isFinite(saved.roundsCompleted) ? saved.roundsCompleted : 0,
-      };
-    } catch {
-      return { bestScore: 0, fastestPerfect: null, missedFacts: {}, roundsCompleted: 0 };
-    }
-  }
-
   function showRecords() {
-    const records = loadRecords();
+    const previewKey = playerKey(elements.playerName.value);
+    const records = getPlayerRecords(previewKey);
     const reviewCount = Object.values(records.missedFacts).filter((weight) => weight > 0).length;
     elements.records.innerHTML = `
       <div class="record"><strong>${records.bestScore}%</strong><span>Best score</span></div>
       <div class="record"><strong>${records.fastestPerfect === null ? "—" : formatTime(records.fastestPerfect)}</strong><span>Fastest 100%</span></div>
       <div class="record"><strong>${reviewCount}</strong><span>Repeats next round</span></div>
     `;
+  }
+
+  function showPlayers() {
+    const state = loadState();
+    elements.playerList.replaceChildren();
+    Object.values(state.players)
+      .sort((first, second) => first.displayName.localeCompare(second.displayName))
+      .forEach((player) => {
+        const option = document.createElement("option");
+        option.value = player.displayName;
+        elements.playerList.append(option);
+      });
+
+    const rankedPlayers = Object.values(state.players)
+      .filter((player) => player.fastestPerfect !== null)
+      .sort((first, second) => first.fastestPerfect - second.fastestPerfect || first.displayName.localeCompare(second.displayName))
+      .slice(0, 5);
+    elements.leaderboardList.replaceChildren();
+    if (rankedPlayers.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "leaderboard-empty";
+      empty.textContent = "Complete a perfect round to join the leaderboard.";
+      elements.leaderboardList.append(empty);
+      return;
+    }
+    rankedPlayers.forEach((player, index) => {
+      const row = document.createElement("li");
+      row.className = "leaderboard-row";
+      const rank = document.createElement("span");
+      rank.className = "leaderboard-rank";
+      rank.textContent = index + 1;
+      const name = document.createElement("span");
+      name.className = "leaderboard-name";
+      name.textContent = player.displayName;
+      const time = document.createElement("span");
+      time.className = "leaderboard-time";
+      time.textContent = formatTime(player.fastestPerfect);
+      row.append(rank, name, time);
+      elements.leaderboardList.append(row);
+    });
   }
 
   function showScreen(screen) {
@@ -203,7 +290,28 @@
     else renderQuestion();
   }
 
-  function startRound() {
+  function selectPlayer() {
+    const displayName = normalizePlayerName(elements.playerName.value);
+    if (!displayName) {
+      elements.playerError.textContent = "Enter a player name to begin.";
+      elements.playerName.focus();
+      return false;
+    }
+    const key = playerKey(displayName);
+    const state = loadState();
+    const existing = state.players[key];
+    state.players[key] = existing || { displayName, ...emptyRecords() };
+    state.currentPlayer = key;
+    saveState(state);
+    activePlayerKey = key;
+    elements.playerName.value = state.players[key].displayName;
+    elements.playerError.textContent = "";
+    showPlayers();
+    return true;
+  }
+
+  function startRound(selectFromInput = false) {
+    if (selectFromInput && !selectPlayer()) return;
     clearInterval(timerId);
     clearTimeout(unlockTimerId);
     answerLocked = false;
@@ -218,7 +326,10 @@
   }
 
   function saveRecords(score, elapsed) {
-    const records = loadRecords();
+    const state = loadState();
+    const player = state.players[activePlayerKey];
+    if (!player) return;
+    const records = normalizeRecords(player);
     records.bestScore = Math.max(records.bestScore, score);
     if (score === 100 && (records.fastestPerfect === null || elapsed < records.fastestPerfect)) {
       records.fastestPerfect = elapsed;
@@ -235,7 +346,9 @@
       }
     });
     records.roundsCompleted += 1;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    state.players[activePlayerKey] = { displayName: player.displayName, ...records };
+    state.currentPlayer = activePlayerKey;
+    saveState(state);
   }
 
   function renderCorrections() {
@@ -270,13 +383,25 @@
     saveRecords(score, elapsed);
     renderCorrections();
     showRecords();
+    showPlayers();
     showScreen("results");
     elements.retryButton.focus();
   }
 
-  elements.startButton.addEventListener("click", startRound);
-  elements.retryButton.addEventListener("click", startRound);
+  elements.startButton.addEventListener("click", () => startRound(true));
+  elements.retryButton.addEventListener("click", () => startRound(false));
+  elements.playerName.addEventListener("input", () => {
+    elements.playerError.textContent = "";
+    showRecords();
+  });
+  elements.playerName.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") startRound(true);
+  });
+  const initialState = loadState();
+  const initialPlayer = initialState.players[initialState.currentPlayer];
+  if (initialPlayer) elements.playerName.value = initialPlayer.displayName;
   showRecords();
+  showPlayers();
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     navigator.serviceWorker.register("service-worker.js").catch(() => {});

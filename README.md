@@ -19,6 +19,8 @@ It is designed for short, repeatable practice without accounts, advertising, tra
 - Three large answer choices
 - Delayed results and correction review
 - Adaptive repeat practice for missed facts
+- Player profiles with separate practice records
+- Device-local family leaderboard for perfect rounds
 - Device-local records and offline caching
 - Responsive keyboard-accessible interface
 
@@ -40,7 +42,7 @@ No account, server, analytics, or paid service is required. Progress remains in 
 
 ## Privacy
 
-All scores and practice history stay in the current browser. The app does not send or collect personal information.
+Player names, scores, and practice history stay in the current browser. The family leaderboard is visible only on that device. The app does not send or collect personal information.
 
 ## Project documents
 

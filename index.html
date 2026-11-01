@@ -29,8 +29,21 @@
         <p class="round-label">20 questions · 3 choices · 10 minutes</p>
         <h2>Accuracy first. Speed comes next.</h2>
         <p>Answers stay hidden until the round is complete. Reach 100%, then try to beat your fastest time.</p>
+        <div class="player-panel">
+          <label for="player-name">Who’s practicing?</label>
+          <input id="player-name" list="player-list" maxlength="16" autocomplete="off" placeholder="Enter a player name" />
+          <datalist id="player-list"></datalist>
+          <p id="player-error" class="field-error" role="alert"></p>
+        </div>
         <div id="records" class="records" aria-label="Personal records"></div>
         <button id="start-button" class="primary-button" type="button">Start practice</button>
+        <section class="leaderboard" aria-labelledby="leaderboard-title">
+          <div class="section-heading">
+            <h3 id="leaderboard-title">Family leaderboard</h3>
+            <span>100% rounds only</span>
+          </div>
+          <ol id="leaderboard-list" class="leaderboard-list"></ol>
+        </section>
       </section>
 
       <section id="quiz-screen" class="card quiz-screen" hidden>

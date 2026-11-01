@@ -13,6 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Device-local player names with separate records and missed-fact practice.
+- Family leaderboard ranking each player’s fastest perfect round.
 - Adaptive review queue that returns missed facts in later rounds.
 - Review weighting that increases after mistakes and decreases after correct answers.
 - Review-queue count in personal records and the active-round status strip.

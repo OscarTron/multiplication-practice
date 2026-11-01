@@ -11,7 +11,7 @@
   const $ = (selector) => document.querySelector(selector);
   const el = {
     start: $("#start-screen"), quiz: $("#quiz-screen"), results: $("#results-screen"),
-    startButton: $("#start-button"), retryButton: $("#retry-button"), homeButton: $("#home-button"), timer: $("#timer"),
+    startButton: $("#start-button"), retryButton: $("#retry-button"), homeButton: $("#home-button"), timer: $("#timer"), timerPanel: $("#timer-panel"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
     playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
     range: $("#range-select"), focus: $("#focus-select"), practiceTime: $("#practice-time-select"), practiceTimeSetting: $("#practice-time-setting"),
@@ -293,7 +293,7 @@
     el.cardProgress.textContent = `Card ${studyIndex + 1} of ${studyCards.length}`; el.previousCard.disabled = studyIndex === 0;
   }
   function finishStudy() {
-    clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = "0:00"; el.cardSession.hidden = true; el.cardComplete.hidden = false; el.restartCards.focus();
+    clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = "0:00"; el.timerPanel.hidden = true; el.cardSession.hidden = true; el.cardComplete.hidden = false; el.restartCards.focus();
   }
   function updateStudyTimer() {
     const remaining = 300 - Math.floor((Date.now() - studyStartedAt) / 1000); el.timer.textContent = formatTime(remaining); if (remaining <= 0) finishStudy();
@@ -303,10 +303,10 @@
     if (!selected.length) { el.cardsError.textContent = "Choose at least one table."; return; }
     const range = Number(el.range.value); studyCards = shuffle(selected.flatMap((left) => Array.from({ length: range + 1 }, (_, right) => ({ left, right }))));
     studyIndex = 0; studyStartedAt = Date.now(); el.cardsError.textContent = ""; el.cardSetup.hidden = true; el.cardComplete.hidden = true; el.cardSession.hidden = false;
-    el.timer.textContent = "5:00"; renderStudyCard(); clearInterval(studyTimerId); studyTimerId = setInterval(updateStudyTimer, 250);
+    el.timer.textContent = "5:00"; el.timerPanel.hidden = false; renderStudyCard(); clearInterval(studyTimerId); studyTimerId = setInterval(updateStudyTimer, 250);
   }
   function openLearn(name) {
-    clearInterval(timerId); clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = name === "cards" ? "5:00" : formatTime(timerSeconds(settingsFromUI()));
+    clearInterval(timerId); clearInterval(studyTimerId); studyTimerId = null; el.timerPanel.hidden = true; el.timer.textContent = name === "cards" ? "5:00" : formatTime(timerSeconds(settingsFromUI()));
     if (name === "chart") buildChart(); else { buildTableChoices(); el.cardSetup.hidden = false; el.cardSession.hidden = true; el.cardComplete.hidden = true; }
     screen(name);
   }
@@ -358,7 +358,7 @@
   function start(select = false) {
     if (select && !choosePlayer()) return;
     clearInterval(timerId); clearTimeout(unlockId); locked = false; activeSettings = settingsFromUI();
-    const level = LEVELS[activeSettings.level]; questions = makeRound(activeSettings); answers = []; index = 0; startedAt = Date.now(); el.timer.textContent = formatTime(timerSeconds(activeSettings));
+    const level = LEVELS[activeSettings.level]; questions = makeRound(activeSettings); answers = []; index = 0; startedAt = Date.now(); el.timer.textContent = formatTime(timerSeconds(activeSettings)); el.timerPanel.hidden = false;
     el.quizNote.textContent = activeSettings.level === 3 ? "Keep going until time is up. Accuracy still comes first." : "Choose your best answer. Results appear at the end.";
     screen("quiz"); render(); timerId = setInterval(updateTimer, 250);
   }
@@ -393,7 +393,7 @@
     el.corrections.innerHTML = `<h3>Practice these again</h3><ul class="correction-list">${rows}</ul>`;
   }
   function finish(timedOut) {
-    clearInterval(timerId); timerId = null; clearTimeout(unlockId);
+    clearInterval(timerId); timerId = null; clearTimeout(unlockId); el.timerPanel.hidden = true;
     const level = LEVELS[activeSettings.level], elapsed = Math.min(timerSeconds(activeSettings), Math.floor((Date.now() - startedAt) / 1000));
     const correct = answers.filter((item) => item.isCorrect).length, score = answers.length ? Math.round(correct / answers.length * 100) : 0;
     el.score.textContent = `${score}%`; el.correctCount.textContent = `${correct}/${activeSettings.level === 3 ? answers.length : level.count}`; el.elapsedTime.textContent = formatTime(elapsed);
@@ -405,7 +405,7 @@
   }
 
   function goHome() {
-    clearInterval(timerId); timerId = null; clearInterval(studyTimerId); studyTimerId = null; clearTimeout(unlockId); locked = false;
+    clearInterval(timerId); timerId = null; clearInterval(studyTimerId); studyTimerId = null; clearTimeout(unlockId); locked = false; el.timerPanel.hidden = true;
     el.timer.textContent = formatTime(timerSeconds(settingsFromUI()));
     screen("start"); refresh(); el.startButton.focus();
   }

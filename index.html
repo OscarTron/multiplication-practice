@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=18" />
+    <link rel="stylesheet" href="styles.css?v=19" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -19,7 +19,7 @@
             <h1>Multiplication Practice</h1>
           </div>
         </div>
-        <div class="timer" aria-live="polite">
+        <div id="timer-panel" class="timer" aria-live="polite" hidden>
           <span>Time left</span>
           <strong id="timer">10:00</strong>
         </div>
@@ -121,7 +121,7 @@
 
       <section id="chart-screen" class="card learn-screen" hidden>
         <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Multiplication chart</h2></div><button id="chart-home" class="secondary-button" type="button">Home</button></div>
-        <p class="learn-note">Tap a number to highlight its row and column.</p>
+        <p class="learn-note">Tap a number to highlight its row and column. Swipe sideways on smaller screens.</p>
         <div id="chart-wrap" class="chart-wrap"></div>
       </section>
 
@@ -187,6 +187,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=18"></script>
+    <script src="app-v8.js?v=19"></script>
   </body>
 </html>

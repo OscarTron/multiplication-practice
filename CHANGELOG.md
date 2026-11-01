@@ -33,6 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Standardized primary and secondary controls and fitted the complete multiplication chart on mobile.
 - Replaced the large motivational introduction with a compact practice heading and round summary.
 - Standardized the interface around one content width, one control height, four text sizes, and consistent spacing.
 - Reduced headline size and font-weight variation for a calmer, more symmetrical start screen.

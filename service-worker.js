@@ -1,5 +1,5 @@
-const CACHE_NAME = "multiplication-practice-v17";
-const APP_FILES = ["./", "./index.html", "./styles.css?v=17", "./app-v8.js?v=17", "./manifest.webmanifest"];
+const CACHE_NAME = "multiplication-practice-v18";
+const APP_FILES = ["./", "./index.html", "./styles.css?v=18", "./app-v8.js?v=18", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_FILES)));

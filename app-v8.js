@@ -7,14 +7,15 @@
     2: { name: "Scholar", count: 30, seconds: 120, text: "Scholar: 30 questions in 2 minutes. Finish accurately before time runs out." },
     3: { name: "Prodigy", count: null, seconds: 120, text: "Prodigy: answer as many questions as you can in 2 minutes." },
   };
-  const DEFAULTS = { level: 1, range: 10, focus: "all" };
+  const DEFAULTS = { level: 1, range: 10, focus: "all", practiceMinutes: 10 };
   const $ = (selector) => document.querySelector(selector);
   const el = {
     start: $("#start-screen"), quiz: $("#quiz-screen"), results: $("#results-screen"),
     startButton: $("#start-button"), retryButton: $("#retry-button"), homeButton: $("#home-button"), timer: $("#timer"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
     playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
-    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
+    range: $("#range-select"), focus: $("#focus-select"), practiceTime: $("#practice-time-select"), practiceTimeSetting: $("#practice-time-setting"),
+    sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
     levelDescription: $("#level-description"), leaderboard: $("#leaderboard-list"),
     leaderboardRule: $("#leaderboard-rule"), stripAnswered: $("#strip-answered"),
     stripRemaining: $("#strip-remaining"), stripReview: $("#strip-review"),
@@ -45,9 +46,10 @@
     const source = value && typeof value === "object" ? value : {};
     const level = [1, 2, 3].includes(Number(source.level)) ? Number(source.level) : 1;
     const range = Number(source.range) === 12 ? 12 : 10;
+    const practiceMinutes = [10, 20, 30].includes(Number(source.practiceMinutes)) ? Number(source.practiceMinutes) : 10;
     const candidate = source.focus === "all" ? "all" : Number(source.focus);
     const focus = candidate === "all" || (Number.isInteger(candidate) && candidate >= 0 && candidate <= range) ? String(candidate) : "all";
-    return { level, range, focus };
+    return { level, range, focus, practiceMinutes };
   }
   const modeKey = (settings) => `level${settings.level}-range${settings.range}-${settings.focus === "all" ? "mixed" : `table${settings.focus}`}`;
   const cleanName = (value) => value.trim().replace(/\s+/g, " ").slice(0, 16);
@@ -81,7 +83,7 @@
     } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, legacy: null }; }
   }
   const save = (state) => localStorage.setItem(STORE, JSON.stringify(state));
-  const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value });
+  const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value, practiceMinutes: el.practiceTime.value });
   function recordsFor(player, settings) {
     const profile = load().players[player];
     return profile && profile.recordsByMode && profile.recordsByMode[modeKey(settings)] || emptyRecords();
@@ -141,7 +143,11 @@
   }
 
   function formatTime(seconds) { return `${Math.floor(Math.max(0, seconds) / 60)}:${String(Math.max(0, seconds) % 60).padStart(2, "0")}`; }
-  function settingsName(settings) { return `${LEVELS[settings.level].name} · 0–${settings.range} · ${settings.focus === "all" ? "Mixed" : `×${settings.focus} only`}`; }
+  function timerSeconds(settings) { return settings.level === 1 ? settings.practiceMinutes * 60 : LEVELS[settings.level].seconds; }
+  function settingsName(settings) {
+    const duration = settings.level === 1 ? ` · ${settings.practiceMinutes} min` : "";
+    return `${LEVELS[settings.level].name}${duration} · 0–${settings.range} · ${settings.focus === "all" ? "Mixed" : `×${settings.focus} only`}`;
+  }
   function fillFocus(range, selected = "all") {
     el.focus.replaceChildren();
     const all = document.createElement("option"); all.value = "all"; all.textContent = "All tables · Mixed"; el.focus.append(all);
@@ -153,8 +159,9 @@
   function showSettings() {
     const settings = settingsFromUI(), level = LEVELS[settings.level];
     el.settingsSummary.textContent = settingsName(settings);
-    el.levelDescription.textContent = level.text;
-    el.roundLabel.textContent = settings.level === 1 ? "Student · 20 questions · 10 minutes"
+    el.practiceTimeSetting.hidden = settings.level !== 1;
+    el.levelDescription.textContent = settings.level === 1 ? `Student: 20 questions with a ${settings.practiceMinutes}-minute timer.` : level.text;
+    el.roundLabel.textContent = settings.level === 1 ? `Student · 20 questions · ${settings.practiceMinutes} minutes`
       : settings.level === 2 ? "Scholar · 30 questions · 2 minutes" : "Prodigy · 2-minute speed round";
     el.leaderboardRule.textContent = settings.level === 3 ? "Accuracy · then correct" : "100% rounds only";
   }
@@ -249,9 +256,9 @@
   }
   function screen(name) { el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results"; }
   function updateTimer() {
-    const level = LEVELS[activeSettings.level], elapsed = Math.floor((Date.now() - startedAt) / 1000), remaining = level.seconds - elapsed;
+    const level = LEVELS[activeSettings.level], duration = timerSeconds(activeSettings), elapsed = Math.floor((Date.now() - startedAt) / 1000), remaining = duration - elapsed;
     el.timer.textContent = formatTime(remaining);
-    if (activeSettings.level === 3) el.progressBar.style.width = `${Math.min(100, elapsed / level.seconds * 100)}%`;
+    if (activeSettings.level === 3) el.progressBar.style.width = `${Math.min(100, elapsed / duration * 100)}%`;
     if (remaining <= 0) finish(true);
   }
   function render() {
@@ -296,7 +303,7 @@
   function start(select = false) {
     if (select && !choosePlayer()) return;
     clearInterval(timerId); clearTimeout(unlockId); locked = false; activeSettings = settingsFromUI();
-    const level = LEVELS[activeSettings.level]; questions = makeRound(activeSettings); answers = []; index = 0; startedAt = Date.now(); el.timer.textContent = formatTime(level.seconds);
+    const level = LEVELS[activeSettings.level]; questions = makeRound(activeSettings); answers = []; index = 0; startedAt = Date.now(); el.timer.textContent = formatTime(timerSeconds(activeSettings));
     el.quizNote.textContent = activeSettings.level === 3 ? "Keep going until time is up. Accuracy still comes first." : "Choose your best answer. Results appear at the end.";
     screen("quiz"); render(); timerId = setInterval(updateTimer, 250);
   }
@@ -318,7 +325,7 @@
     if (!Array.isArray(player.history)) player.history = [];
     player.history.push({
       completedAt: new Date().toISOString(), level: activeSettings.level, range: activeSettings.range,
-      focus: activeSettings.focus, mode: settingsName(activeSettings), score, correct,
+      focus: activeSettings.focus, practiceMinutes: activeSettings.practiceMinutes, mode: settingsName(activeSettings), score, correct,
       answered: answers.length, elapsed,
     });
     player.history = player.history.slice(-200);
@@ -332,19 +339,19 @@
   }
   function finish(timedOut) {
     clearInterval(timerId); timerId = null; clearTimeout(unlockId);
-    const level = LEVELS[activeSettings.level], elapsed = Math.min(level.seconds, Math.floor((Date.now() - startedAt) / 1000));
+    const level = LEVELS[activeSettings.level], elapsed = Math.min(timerSeconds(activeSettings), Math.floor((Date.now() - startedAt) / 1000));
     const correct = answers.filter((item) => item.isCorrect).length, score = answers.length ? Math.round(correct / answers.length * 100) : 0;
     el.score.textContent = `${score}%`; el.correctCount.textContent = `${correct}/${activeSettings.level === 3 ? answers.length : level.count}`; el.elapsedTime.textContent = formatTime(elapsed);
     el.resultHeading.textContent = score === 100 && answers.length ? "Perfect accuracy!" : "Round complete!";
     el.resultMessage.textContent = activeSettings.level === 3 ? `You answered ${answers.length} questions and got ${correct} correct. Keep accuracy high as your total grows.`
-      : timedOut ? `Time is up. You answered ${answers.length} of ${level.count} questions. Review, then try again.`
+      : timedOut ? `Time is up! You answered ${answers.length} of ${level.count} questions. Great effort—every round makes you stronger.`
         : score === 100 ? "Excellent work. Try again when you are ready to improve your time." : "Good practice. Practice the missed problems, then try another round.";
     storeResult(score, correct, elapsed); showCorrections(); showRecords(); showPlayers(); showProgress(); screen("results"); el.retryButton.focus();
   }
 
   function goHome() {
     clearInterval(timerId); timerId = null; clearTimeout(unlockId); locked = false;
-    el.timer.textContent = formatTime(LEVELS[settingsFromUI().level].seconds);
+    el.timer.textContent = formatTime(timerSeconds(settingsFromUI()));
     screen("start"); refresh(); el.startButton.focus();
   }
 
@@ -353,11 +360,11 @@
     el.playerError.textContent = ""; showRecords(); showProgress();
   });
   el.playerName.addEventListener("keydown", (event) => { if (event.key === "Enter") start(true); });
-  el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
+  el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.practiceTime.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
   el.exportProgress.addEventListener("click", exportProgress);
   el.range.addEventListener("change", () => { fillFocus(Number(el.range.value), el.focus.value); refresh(); });
 
-  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
+  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.practiceTime.value = initial.settings.practiceMinutes; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
   if (initial.players[initial.currentPlayer]) {
     el.playerName.value = initial.players[initial.currentPlayer].displayName;
   }

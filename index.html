@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=15" />
+    <link rel="stylesheet" href="styles.css?v=16" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -55,6 +55,14 @@
               <select id="range-select">
                 <option value="10">0–10 · Standard</option>
                 <option value="12">0–12 · Extended</option>
+              </select>
+            </label>
+            <label id="practice-time-setting">
+              <span>Practice time</span>
+              <select id="practice-time-select">
+                <option value="10">10 minutes</option>
+                <option value="20">20 minutes</option>
+                <option value="30">30 minutes</option>
               </select>
             </label>
             <label>
@@ -146,6 +154,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=15"></script>
+    <script src="app-v8.js?v=16"></script>
   </body>
 </html>

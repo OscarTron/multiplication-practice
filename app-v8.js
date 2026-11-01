@@ -41,9 +41,10 @@
     };
   }
   function cleanSettings(value) {
-    const level = [1, 2, 3].includes(Number(value?.level)) ? Number(value.level) : 1;
-    const range = Number(value?.range) === 12 ? 12 : 10;
-    const candidate = value?.focus === "all" ? "all" : Number(value?.focus);
+    const source = value && typeof value === "object" ? value : {};
+    const level = [1, 2, 3].includes(Number(source.level)) ? Number(source.level) : 1;
+    const range = Number(source.range) === 12 ? 12 : 10;
+    const candidate = source.focus === "all" ? "all" : Number(source.focus);
     const focus = candidate === "all" || (Number.isInteger(candidate) && candidate >= 0 && candidate <= range) ? String(candidate) : "all";
     return { level, range, focus };
   }
@@ -51,9 +52,9 @@
   const cleanName = (value) => value.trim().replace(/\s+/g, " ").slice(0, 16);
   const playerKey = (value) => cleanName(value).toLocaleLowerCase();
   function cleanPlayer(value, fallback) {
-    const displayName = cleanName(value?.displayName || fallback);
+    const displayName = cleanName((value && value.displayName) || fallback);
     const recordsByMode = {};
-    if (value?.recordsByMode && typeof value.recordsByMode === "object") {
+    if (value && value.recordsByMode && typeof value.recordsByMode === "object") {
       Object.entries(value.recordsByMode).forEach(([key, records]) => { recordsByMode[key] = cleanRecords(records); });
     } else if (value && typeof value === "object") {
       recordsByMode["level1-range12-mixed"] = cleanRecords(value);
@@ -73,13 +74,16 @@
         version: 4, players, currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
         settings: cleanSettings(saved.settings),
         sound: saved.sound === true,
-        legacy: saved.legacy || (oldFields.some((field) => Object.hasOwn(saved, field)) ? cleanRecords(saved) : null),
+        legacy: saved.legacy || (oldFields.some((field) => Object.prototype.hasOwnProperty.call(saved, field)) ? cleanRecords(saved) : null),
       };
     } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, legacy: null }; }
   }
   const save = (state) => localStorage.setItem(STORE, JSON.stringify(state));
   const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value });
-  function recordsFor(player, settings) { return load().players[player]?.recordsByMode?.[modeKey(settings)] || emptyRecords(); }
+  function recordsFor(player, settings) {
+    const profile = load().players[player];
+    return profile && profile.recordsByMode && profile.recordsByMode[modeKey(settings)] || emptyRecords();
+  }
 
   function shuffle(items) {
     const copy = [...items];
@@ -193,7 +197,7 @@
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!el.sound.checked || !AudioContextClass) return;
     try {
-      audioContext ||= new AudioContextClass();
+      if (!audioContext) audioContext = new AudioContextClass();
       const now = audioContext.currentTime;
       const frequencies = isCorrect ? [523, 659] : [220, 185];
       frequencies.forEach((frequency, note) => {
@@ -228,7 +232,8 @@
       const button = document.createElement("button"); button.type = "button"; button.className = "choice"; button.textContent = choice;
       button.setAttribute("aria-label", `Answer ${choice}`); button.disabled = locked; button.addEventListener("click", () => answer(choice, renderedIndex, button)); el.choices.append(button);
     });
-    el.choices.querySelector("button")?.focus();
+    const firstChoice = el.choices.querySelector("button");
+    if (firstChoice) firstChoice.focus();
   }
   function answer(choice, renderedIndex, selectedButton) {
     if (locked || renderedIndex !== index) return;
@@ -249,7 +254,8 @@
     const displayName = cleanName(el.playerName.value);
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
-    state.players[key] ||= { displayName, recordsByMode: {} }; state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
+    if (!state.players[key]) state.players[key] = { displayName, recordsByMode: {} };
+    state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
   function start(select = false) {

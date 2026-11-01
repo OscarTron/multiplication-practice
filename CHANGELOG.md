@@ -38,6 +38,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Made table-filter options available directly in the page instead of depending on JavaScript to create them.
+- Replaced unsupported newer JavaScript syntax for compatibility with older mobile browsers.
+- Changed offline loading to prefer the newest published files before cached copies.
 - Versioned app assets so existing offline installations receive new code after updates.
 - Prevented rapid or queued double-clicks from recording two answers or skipping a question.
 

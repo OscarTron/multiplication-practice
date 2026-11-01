@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=9" />
+    <link rel="stylesheet" href="styles.css?v=10" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -58,7 +58,20 @@
             </label>
             <label>
               <span>Table filter</span>
-              <select id="focus-select"></select>
+              <select id="focus-select">
+                <option value="all">All tables · Mixed</option>
+                <option value="0">×0 table only</option>
+                <option value="1">×1 table only</option>
+                <option value="2">×2 table only</option>
+                <option value="3">×3 table only</option>
+                <option value="4">×4 table only</option>
+                <option value="5">×5 table only</option>
+                <option value="6">×6 table only</option>
+                <option value="7">×7 table only</option>
+                <option value="8">×8 table only</option>
+                <option value="9">×9 table only</option>
+                <option value="10">×10 table only</option>
+              </select>
             </label>
             <label class="sound-setting">
               <span>Sound effects</span>
@@ -118,6 +131,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=9"></script>
+    <script src="app-v8.js?v=10"></script>
   </body>
 </html>

@@ -23,6 +23,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Simplified adaptive-practice wording for younger readers.
 - Prepared standalone public-repository documentation and MIT licensing.
 - Published the initial public repository and GitHub Pages site.
+- Introduced an original learning-game visual system with a controlled teal, navy, coral, and yellow palette.
+- Improved mobile proportions, button tactility, progress hierarchy, and results presentation.
 
 ### Fixed
 

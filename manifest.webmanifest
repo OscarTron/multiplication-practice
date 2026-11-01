@@ -4,6 +4,6 @@
   "description": "Practice multiplication facts from 0 through 12.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#eef5fb",
-  "theme_color": "#275dad"
+  "background_color": "#f2faf7",
+  "theme_color": "#18a999"
 }

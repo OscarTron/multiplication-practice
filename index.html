@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#275dad" />
+    <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts from 0 through 12." />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="styles.css" />
@@ -12,9 +12,12 @@
   <body>
     <main class="app-shell">
       <header class="app-header">
-        <div>
-          <p class="eyebrow">0–12 MULTIPLICATION</p>
-          <h1>Multiplication Practice</h1>
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">×</div>
+          <div>
+            <p class="eyebrow">0–12 MULTIPLICATION</p>
+            <h1>Multiplication Practice</h1>
+          </div>
         </div>
         <div class="timer" aria-live="polite">
           <span>Time left</span>
@@ -55,6 +58,7 @@
       </section>
 
       <section id="results-screen" class="card results-screen" hidden>
+        <div class="celebration" aria-hidden="true">★</div>
         <p class="round-label">ROUND COMPLETE</p>
         <h2 id="result-heading">Great effort!</h2>
         <div class="result-grid">

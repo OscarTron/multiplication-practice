@@ -326,8 +326,16 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
   .card { border-radius: 22px; }
   .learn-screen { padding-inline: 12px; }
   .start-heading { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .player-panel, .settings-panel, .learn-panel, .progress-panel, .start-screen > #start-button { margin-top: 20px; }
+  .player-panel input { min-height: 52px; border-radius: 14px; }
+  .primary-button, .secondary-button { min-height: 56px; padding-inline: 18px; border-radius: 14px; }
+  .primary-button { box-shadow: 0 5px 0 var(--teal-dark); }
+  .secondary-button { box-shadow: 0 5px 0 var(--navy); }
+  .settings-panel summary, .progress-panel summary { min-height: 72px; padding: 10px 14px; border-radius: 14px; box-shadow: 0 5px 0 var(--navy); }
+  .settings-panel summary::after, .progress-panel summary::after { width: 26px; height: 26px; border-radius: 7px; }
   .records { gap: 7px; }
-  .learn-actions { grid-template-columns: 1fr; }
+  .learn-panel { padding: 18px; border-radius: 14px; }
+  .learn-actions { grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
   .learn-header { align-items: stretch; flex-direction: column; }
   .learn-header .secondary-button { width: 100%; }
   .table-checkboxes { grid-template-columns: repeat(3, 1fr); }

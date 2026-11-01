@@ -34,6 +34,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Standardized mobile control heights, spacing, corner radii, and shadows without changing the desktop layout.
 - Standardized headings, buttons, settings, and compact labels using consistent title capitalization.
 - Standardized key home-screen labels in title case and renamed Study Cards to Flash Cards.
 - Reordered the home screen around Start Practice and grouped records, leaderboard, and history under My Progress.

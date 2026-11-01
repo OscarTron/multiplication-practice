@@ -22,6 +22,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Simplified adaptive-practice wording for younger readers.
 - Prepared standalone public-repository documentation and MIT licensing.
+- Published the initial public repository and GitHub Pages site.
 
 ### Fixed
 

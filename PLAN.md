@@ -19,7 +19,7 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [x] Complete a final browser round with physical double-click protection verified.
 - [x] Complete a child-focused heuristic usability review.
 - [ ] Complete child usability testing and adjust wording or sizing.
-- [ ] Publish the repository and enable GitHub Pages.
+- [x] Publish the public repository and enable GitHub Pages.
 
 ## Phase 2 — Smarter practice
 
@@ -42,6 +42,7 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [ ] Test on current Chrome, Edge, Firefox, and Safari.
 - [ ] Test installation and offline use on desktop and mobile.
 - [x] Prepare standalone repository documentation, ignore rules, and an open-source license.
+- [x] Publish version 0.1.0 through GitHub Pages.
 - [ ] Add screenshots and contribution guidance.
 - [ ] Tag the first stable release.
 

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#275dad" />
+    <meta name="description" content="Practice multiplication facts from 0 through 12." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Multiplication Practice</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">0–12 MULTIPLICATION</p>
+          <h1>Multiplication Practice</h1>
+        </div>
+        <div class="timer" aria-live="polite">
+          <span>Time left</span>
+          <strong id="timer">10:00</strong>
+        </div>
+      </header>
+
+      <section id="start-screen" class="card start-screen">
+        <p class="round-label">20 questions · 3 choices · 10 minutes</p>
+        <h2>Accuracy first. Speed comes next.</h2>
+        <p>Answers stay hidden until the round is complete. Reach 100%, then try to beat your fastest time.</p>
+        <div id="records" class="records" aria-label="Personal records"></div>
+        <button id="start-button" class="primary-button" type="button">Start practice</button>
+      </section>
+
+      <section id="quiz-screen" class="card quiz-screen" hidden>
+        <div class="round-strip" aria-label="Round status">
+          <span><strong id="strip-answered">0</strong> Answered</span>
+          <span><strong id="strip-remaining">20</strong> Remaining</span>
+          <span><strong id="strip-review">0</strong> Repeats</span>
+        </div>
+        <div class="progress-row">
+          <span id="progress-text">Question 1 of 20</span>
+          <span id="answered-text">0 answered</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="question-area">
+          <p class="prompt">What is</p>
+          <h2 id="question" class="question" aria-label="7 times 8">
+            <span id="factor-top">7</span>
+            <span class="factor-bottom"><span class="multiply-sign">×</span><span id="factor-bottom">8</span></span>
+          </h2>
+          <div id="choices" class="choices" aria-label="Answer choices"></div>
+        </div>
+        <p class="quiz-note">Choose your best answer. Results appear at the end.</p>
+      </section>
+
+      <section id="results-screen" class="card results-screen" hidden>
+        <p class="round-label">ROUND COMPLETE</p>
+        <h2 id="result-heading">Great effort!</h2>
+        <div class="result-grid">
+          <div><strong id="score">0%</strong><span>Score</span></div>
+          <div><strong id="correct-count">0/20</strong><span>Correct</span></div>
+          <div><strong id="elapsed-time">0:00</strong><span>Time</span></div>
+        </div>
+        <div id="result-message" class="result-message"></div>
+        <div id="corrections" class="corrections"></div>
+        <button id="retry-button" class="primary-button" type="button">Try another round</button>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

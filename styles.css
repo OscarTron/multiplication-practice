@@ -100,9 +100,9 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
 }
 
 .start-screen { text-align: center; }
-.start-screen .round-label { display: inline-block; margin-bottom: 18px; padding: 8px 13px; border-radius: 999px; color: var(--teal-dark); background: var(--teal-soft); letter-spacing: .04em; }
-.start-screen h2 { max-width: var(--content-width); margin: 0 auto var(--space-3); }
-.start-screen > p:not(.round-label) { max-width: var(--content-width); margin-inline: auto; color: var(--muted); font-size: var(--text-body); font-weight: 500; line-height: 1.55; }
+.start-heading { display: flex; width: 100%; max-width: var(--content-width); margin: 0 auto var(--space-4); align-items: center; justify-content: space-between; gap: var(--space-3); text-align: left; }
+.start-heading h2 { margin: 0; font-size: 1.15rem; }
+.start-screen .round-label { flex: 0 0 auto; margin: 0; padding: 8px 13px; border-radius: 999px; color: var(--teal-dark); background: var(--teal-soft); letter-spacing: .04em; white-space: nowrap; }
 .player-panel { width: 100%; max-width: var(--content-width); margin: var(--space-4) auto 0; text-align: left; }
 .player-panel label { display: block; margin-bottom: var(--space-1); font-size: var(--text-label); font-weight: 700; }
 .player-panel input {
@@ -279,6 +279,7 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
   .eyebrow { font-size: .62rem; }
   .timer { min-width: 84px; padding-inline: 8px; }
   .card { border-radius: 22px; }
+  .start-heading { align-items: flex-start; flex-direction: column; gap: 9px; }
   .records { gap: 7px; }
   .settings-grid { grid-template-columns: 1fr; }
   .settings-panel summary { align-items: center; }

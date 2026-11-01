@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=21" />
+    <link rel="stylesheet" href="styles.css?v=22" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -30,14 +30,14 @@
           <p id="round-label" class="round-label">Student · 20 questions · 10 minutes</p>
         </div>
         <div class="player-panel">
-          <label for="player-name">Who’s practicing?</label>
+          <label for="player-name">Who’s Practicing?</label>
           <input id="player-name" list="player-list" maxlength="16" autocomplete="off" placeholder="Enter a player name" />
           <datalist id="player-list"></datalist>
           <p id="player-error" class="field-error" role="alert"></p>
         </div>
         <details class="settings-panel">
           <summary>
-            <span>Practice settings</span>
+            <span>Practice Settings</span>
             <strong id="settings-summary">Student · 0–10 · Mixed</strong>
           </summary>
           <div class="settings-grid">
@@ -89,16 +89,16 @@
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
         </details>
-        <button id="start-button" class="primary-button" type="button">Start practice</button>
+        <button id="start-button" class="primary-button" type="button">Start Practice</button>
         <section class="learn-panel" aria-labelledby="learn-title">
           <div class="section-heading"><h3 id="learn-title">Learn</h3><span>Review before testing</span></div>
           <div class="learn-actions">
-            <button id="open-chart" class="secondary-button" type="button">Review chart</button>
-            <button id="open-cards" class="secondary-button" type="button">Study cards</button>
+            <button id="open-chart" class="secondary-button" type="button">Review Chart</button>
+            <button id="open-cards" class="secondary-button" type="button">Flash Cards</button>
           </div>
         </section>
         <details class="progress-panel my-progress-panel">
-          <summary>My progress</summary>
+          <summary>My Progress</summary>
           <div class="my-progress-content">
             <div id="records" class="records" aria-label="Personal records"></div>
             <section class="leaderboard" aria-labelledby="leaderboard-title">
@@ -130,7 +130,7 @@
       </section>
 
       <section id="cards-screen" class="card learn-screen" hidden>
-        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>Five-minute study cards</h2></div><button id="cards-home" class="secondary-button" type="button">Home</button></div>
+        <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>5 Minute Flashcards</h2></div><button id="cards-home" class="secondary-button" type="button">Home</button></div>
         <div id="card-setup">
           <p class="learn-note">Choose one or more tables. Every card shows the problem and answer.</p>
           <div class="table-select-actions"><button id="select-all-tables" class="text-button" type="button">Select all</button><button id="clear-tables" class="text-button" type="button">Clear all</button></div>
@@ -191,6 +191,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=21"></script>
+    <script src="app-v8.js?v=22"></script>
   </body>
 </html>

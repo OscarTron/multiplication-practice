@@ -30,7 +30,7 @@ Student uses the original 20-question, 10-minute format. Scholar gives 30 questi
 - Round-by-round progress table with CSV download
 - Home navigation from completed rounds
 - Interactive 0–10 or 0–12 multiplication chart
-- Five-minute study cards with one or multiple selected tables
+- Five-minute flashcards with one or multiple selected tables
 - Device-local records and offline caching
 - Responsive keyboard-accessible interface
 - Original sci-fi interface typography using an offline system-font stack

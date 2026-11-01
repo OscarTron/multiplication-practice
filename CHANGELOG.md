@@ -30,6 +30,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Versioned app assets so existing offline installations receive new code after updates.
 - Prevented rapid or queued double-clicks from recording two answers or skipping a question.
 
 ## [0.1.0] - 2026-11-01

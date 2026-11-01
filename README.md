@@ -29,7 +29,6 @@ Student uses the original 20-question, 10-minute format. Scholar gives 30 questi
 - Device-local family leaderboard for perfect rounds
 - Round-by-round progress table with CSV download
 - Home navigation from completed rounds
-- Optional locally generated DnB study loop
 - Device-local records and offline caching
 - Responsive keyboard-accessible interface
 - Original sci-fi interface typography using an offline system-font stack

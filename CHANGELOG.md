@@ -15,7 +15,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Home navigation from the results screen.
 - Per-player round history with an on-screen progress table and CSV download.
-- An optional offline procedural DnB study loop while the final Suno track is selected.
 - Correct and incorrect answer animations with optional device-generated tones.
 - A saved sound-effects setting that defaults to off.
 - Practice settings for standard 0–10 and extended 0–12 ranges.
@@ -41,6 +40,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Published the initial public repository and GitHub Pages site.
 - Introduced an original learning-game visual system with a controlled teal, navy, coral, and yellow palette.
 - Improved mobile proportions, button tactility, progress hierarchy, and results presentation.
+
+### Removed
+
+- The temporary procedural DnB study loop and Music setting.
 
 ### Fixed
 

@@ -35,7 +35,7 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [ ] Design original player characters before restoring profile icons.
 - [x] Add a results-screen Home button.
 - [x] Add per-player round history and CSV progress export.
-- [x] Add an optional local DnB study loop control.
+- [ ] Add final user-produced music after the track is ready.
 - [ ] Add a simple 30-minute daily-practice indicator.
 
 ## Phase 3 — Motivation and progress

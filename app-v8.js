@@ -14,7 +14,7 @@
     startButton: $("#start-button"), retryButton: $("#retry-button"), homeButton: $("#home-button"), timer: $("#timer"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
     playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
-    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), music: $("#music-toggle"), settingsSummary: $("#settings-summary"),
+    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
     levelDescription: $("#level-description"), leaderboard: $("#leaderboard-list"),
     leaderboardRule: $("#leaderboard-rule"), stripAnswered: $("#strip-answered"),
     stripRemaining: $("#strip-remaining"), stripReview: $("#strip-review"),
@@ -29,7 +29,6 @@
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
   let audioContext = null;
-  let musicTimer = null, musicMaster = null, nextMusicNote = 0, musicStep = 0;
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
   function cleanRecords(value) {
@@ -76,10 +75,10 @@
       return {
         version: 4, players, currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
         settings: cleanSettings(saved.settings),
-        sound: saved.sound === true, music: saved.music === true,
+        sound: saved.sound === true,
         legacy: saved.legacy || (oldFields.some((field) => Object.prototype.hasOwnProperty.call(saved, field)) ? cleanRecords(saved) : null),
       };
-    } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, music: false, legacy: null }; }
+    } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, legacy: null }; }
   }
   const save = (state) => localStorage.setItem(STORE, JSON.stringify(state));
   const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value });
@@ -226,7 +225,7 @@
   }
   function refresh() {
     showSettings(); showRecords(); showPlayers(); showProgress();
-    const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; state.music = el.music.checked; save(state);
+    const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
   }
 
   function playTone(isCorrect) {
@@ -247,58 +246,6 @@
         oscillator.start(now + note * 0.09); oscillator.stop(now + note * 0.09 + 0.14);
       });
     } catch { /* Visual feedback remains available if audio is blocked. */ }
-  }
-  function scheduleMusicTone(frequency, time, duration, type, volume) {
-    const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
-    oscillator.type = type; oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.0001, time); gain.gain.exponentialRampToValueAtTime(volume, time + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
-    oscillator.connect(gain).connect(musicMaster); oscillator.start(time); oscillator.stop(time + duration + 0.02);
-  }
-  function scheduleMusicNoise(time, duration, volume, highpass) {
-    const length = Math.max(1, Math.floor(audioContext.sampleRate * duration));
-    const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate), data = buffer.getChannelData(0);
-    for (let i = 0; i < length; i += 1) data[i] = Math.random() * 2 - 1;
-    const source = audioContext.createBufferSource(), filter = audioContext.createBiquadFilter(), gain = audioContext.createGain();
-    source.buffer = buffer; filter.type = "highpass"; filter.frequency.value = highpass;
-    gain.gain.setValueAtTime(volume, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
-    source.connect(filter).connect(gain).connect(musicMaster); source.start(time); source.stop(time + duration);
-  }
-  function scheduleMusicStep(step, time) {
-    if ([0, 7, 10].includes(step)) {
-      const kick = audioContext.createOscillator(), gain = audioContext.createGain();
-      kick.type = "sine"; kick.frequency.setValueAtTime(145, time); kick.frequency.exponentialRampToValueAtTime(45, time + 0.12);
-      gain.gain.setValueAtTime(0.12, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.14);
-      kick.connect(gain).connect(musicMaster); kick.start(time); kick.stop(time + 0.15);
-    }
-    if (step === 4 || step === 12) scheduleMusicNoise(time, 0.12, 0.07, 900);
-    if (step % 2 === 0) scheduleMusicNoise(time, 0.035, 0.018, 5200);
-    const bassNotes = { 0: 55, 3: 55, 6: 65.41, 8: 73.42, 11: 65.41, 14: 49 };
-    if (bassNotes[step]) scheduleMusicTone(bassNotes[step], time, 0.16, "sawtooth", 0.025);
-    const plucks = { 0: 440, 4: 523.25, 8: 659.25, 12: 523.25 };
-    if (plucks[step]) scheduleMusicTone(plucks[step], time, 0.1, "triangle", 0.018);
-  }
-  function runMusicScheduler() {
-    while (nextMusicNote < audioContext.currentTime + 0.12) {
-      scheduleMusicStep(musicStep, nextMusicNote); musicStep = (musicStep + 1) % 16; nextMusicNote += 60 / 174 / 4;
-    }
-  }
-  function startMusic() {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass || musicTimer) return;
-    if (!audioContext) audioContext = new AudioContextClass();
-    if (audioContext.state === "suspended") audioContext.resume();
-    musicMaster = audioContext.createGain(); musicMaster.gain.value = 0.55; musicMaster.connect(audioContext.destination);
-    musicStep = 0; nextMusicNote = audioContext.currentTime + 0.05; runMusicScheduler();
-    musicTimer = setInterval(runMusicScheduler, 25);
-  }
-  function stopMusic() {
-    if (musicTimer) clearInterval(musicTimer); musicTimer = null;
-    if (musicMaster && audioContext) {
-      musicMaster.gain.setTargetAtTime(0.0001, audioContext.currentTime, 0.04);
-      const oldMaster = musicMaster; setTimeout(() => oldMaster.disconnect(), 250);
-    }
-    musicMaster = null;
   }
   function screen(name) { el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results"; }
   function updateTimer() {
@@ -343,7 +290,7 @@
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
     if (!state.players[key]) state.players[key] = { displayName, history: [], recordsByMode: {} };
-    state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; state.music = el.music.checked; save(state);
+    state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
   function start(select = false) {
@@ -407,15 +354,13 @@
   });
   el.playerName.addEventListener("keydown", (event) => { if (event.key === "Enter") start(true); });
   el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
-  el.music.addEventListener("change", () => { if (el.music.checked) startMusic(); else stopMusic(); refresh(); });
   el.exportProgress.addEventListener("click", exportProgress);
   el.range.addEventListener("change", () => { fillFocus(Number(el.range.value), el.focus.value); refresh(); });
 
-  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; el.music.checked = initial.music; fillFocus(initial.settings.range, initial.settings.focus);
+  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
   if (initial.players[initial.currentPlayer]) {
     el.playerName.value = initial.players[initial.currentPlayer].displayName;
   }
   refresh();
-  document.addEventListener("pointerdown", () => { if (el.music.checked) startMusic(); }, { once: true });
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("service-worker.js").catch(() => {});
 })();

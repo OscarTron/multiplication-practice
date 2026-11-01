@@ -325,8 +325,10 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
   .settings-panel, .learn-panel, .progress-panel, #start-button { width: 100%; max-width: none; }
   #start-button, .learn-actions .secondary-button { width: 100%; max-width: none; }
   .settings-grid { grid-template-columns: 1fr; }
-  .settings-panel summary { align-items: center; }
-  .settings-panel summary strong { max-width: 130px; }
+  .settings-panel summary { grid-template-columns: minmax(0, 1fr) 28px; align-items: center; }
+  .settings-panel summary > span { grid-column: 1; grid-row: 1; }
+  .settings-panel summary::after { grid-column: 2; grid-row: 1; }
+  .settings-panel summary strong { max-width: none; grid-column: 1 / -1; grid-row: 2; overflow: visible; color: var(--muted); text-align: left; text-overflow: clip; white-space: normal; }
   .settings-grid > .sound-setting { grid-column: auto; }
   .record { padding-inline: 5px; }
   .record strong { font-size: 1.15rem; }

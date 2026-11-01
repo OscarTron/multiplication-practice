@@ -52,6 +52,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Moved the mobile settings summary to a readable second line.
 - Hid inactive timers and aligned mobile navigation, progress, and utility controls.
 - Made table-filter options available directly in the page instead of depending on JavaScript to create them.
 - Replaced unsupported newer JavaScript syntax for compatibility with older mobile browsers.

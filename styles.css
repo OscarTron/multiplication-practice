@@ -331,7 +331,7 @@ h2 { font-size: var(--text-title); font-weight: 800; letter-spacing: -.025em; li
   .primary-button, .secondary-button { min-height: 56px; padding-inline: 18px; border-radius: 14px; }
   .primary-button { box-shadow: 0 5px 0 var(--teal-dark); }
   .secondary-button { box-shadow: 0 5px 0 var(--navy); }
-  .settings-panel summary, .progress-panel summary { min-height: 72px; padding: 10px 14px; border-radius: 14px; box-shadow: 0 5px 0 var(--navy); }
+  .settings-panel summary, .progress-panel summary { min-height: 78px; padding: 10px 14px; border-radius: 14px; box-shadow: 0 5px 0 var(--navy); }
   .settings-panel summary::after, .progress-panel summary::after { width: 26px; height: 26px; border-radius: 7px; }
   .records { gap: 7px; }
   .learn-panel { padding: 18px; border-radius: 14px; }

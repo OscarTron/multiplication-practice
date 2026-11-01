@@ -1,6 +1,6 @@
 # Multiplication Practice
 
-A small, local-first multiplication practice app for facts from 0 through 12.
+A small, local-first multiplication practice app with standard 0–10 and extended 0–12 ranges.
 
 It is designed for short, repeatable practice without accounts, advertising, tracking, or paid services.
 
@@ -13,12 +13,17 @@ It is designed for short, repeatable practice without accounts, advertising, tra
 - Missed facts return in later rounds for extra practice.
 - The goal is 100% accuracy, followed by a faster personal-best time.
 
+Level 1 uses the original 20-question, 10-minute format. Level 2 gives 30 questions in 2 minutes. Level 3 is a 2-minute speed round with no question limit.
+
 ## Features
 
 - Vertical worksheet-style multiplication problems
 - Three large answer choices
 - Delayed results and correction review
 - Adaptive repeat practice for missed facts
+- Standard 0–10 and extended 0–12 number ranges
+- Focused practice for any single multiplication table
+- Three selectable practice levels with separate records
 - Player profiles with separate practice records
 - Device-local family leaderboard for perfect rounds
 - Device-local records and offline caching

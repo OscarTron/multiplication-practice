@@ -13,6 +13,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Practice settings for standard 0–10 and extended 0–12 ranges.
+- Single-table filters that remain active until cleared.
+- Level 2 with 30 questions in 2 minutes and Level 3 with unlimited questions in 2 minutes.
+- Separate player records and leaderboards for each range, table filter, and level.
 - Device-local player names with separate records and missed-fact practice.
 - Family leaderboard ranking each player’s fastest perfect round.
 - Adaptive review queue that returns missed facts in later rounds.
@@ -22,6 +26,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Made Level 1 with mixed 0–10 facts the default practice mode.
 - Simplified adaptive-practice wording for younger readers.
 - Prepared standalone public-repository documentation and MIT licensing.
 - Published the initial public repository and GitHub Pages site.

@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#18a999" />
-    <meta name="description" content="Practice multiplication facts from 0 through 12." />
+    <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=8" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -15,7 +15,7 @@
         <div class="brand-lockup">
           <div class="brand-mark" aria-hidden="true">×</div>
           <div>
-            <p class="eyebrow">0–12 MULTIPLICATION</p>
+            <p class="eyebrow">MULTIPLICATION TRAINING</p>
             <h1>Multiplication Practice</h1>
           </div>
         </div>
@@ -26,7 +26,7 @@
       </header>
 
       <section id="start-screen" class="card start-screen">
-        <p class="round-label">20 questions · 3 choices · 10 minutes</p>
+        <p id="round-label" class="round-label">Level 1 · 20 questions · 10 minutes</p>
         <h2>Accuracy first. Speed comes next.</h2>
         <p>Answers stay hidden until the round is complete. Reach 100%, then try to beat your fastest time.</p>
         <div class="player-panel">
@@ -35,12 +35,40 @@
           <datalist id="player-list"></datalist>
           <p id="player-error" class="field-error" role="alert"></p>
         </div>
+        <details class="settings-panel">
+          <summary>
+            <span>Practice settings</span>
+            <strong id="settings-summary">Level 1 · 0–10 · Mixed</strong>
+          </summary>
+          <div class="settings-grid">
+            <label>
+              <span>Level</span>
+              <select id="level-select">
+                <option value="1">Level 1 · Practice</option>
+                <option value="2">Level 2 · Challenge</option>
+                <option value="3">Level 3 · Speed</option>
+              </select>
+            </label>
+            <label>
+              <span>Number range</span>
+              <select id="range-select">
+                <option value="10">0–10 · Standard</option>
+                <option value="12">0–12 · Extended</option>
+              </select>
+            </label>
+            <label>
+              <span>Table filter</span>
+              <select id="focus-select"></select>
+            </label>
+          </div>
+          <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
+        </details>
         <div id="records" class="records" aria-label="Personal records"></div>
         <button id="start-button" class="primary-button" type="button">Start practice</button>
         <section class="leaderboard" aria-labelledby="leaderboard-title">
           <div class="section-heading">
             <h3 id="leaderboard-title">Family leaderboard</h3>
-            <span>100% rounds only</span>
+            <span id="leaderboard-rule">100% rounds only</span>
           </div>
           <ol id="leaderboard-list" class="leaderboard-list"></ol>
         </section>
@@ -67,7 +95,7 @@
           </h2>
           <div id="choices" class="choices" aria-label="Answer choices"></div>
         </div>
-        <p class="quiz-note">Choose your best answer. Results appear at the end.</p>
+        <p id="quiz-note" class="quiz-note">Choose your best answer. Results appear at the end.</p>
       </section>
 
       <section id="results-screen" class="card results-screen" hidden>
@@ -85,6 +113,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=7"></script>
+    <script src="app-v8.js"></script>
   </body>
 </html>

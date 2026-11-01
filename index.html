@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=11" />
+    <link rel="stylesheet" href="styles.css?v=12" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -35,19 +35,6 @@
           <datalist id="player-list"></datalist>
           <p id="player-error" class="field-error" role="alert"></p>
         </div>
-        <fieldset class="avatar-picker">
-          <legend>Choose your animal</legend>
-          <div id="avatar-options" class="avatar-options">
-            <button class="avatar-option selected" type="button" data-icon="🐨" aria-label="Koala" aria-pressed="true">🐨</button>
-            <button class="avatar-option" type="button" data-icon="🐻" aria-label="Bear" aria-pressed="false">🐻</button>
-            <button class="avatar-option" type="button" data-icon="🐭" aria-label="Mouse" aria-pressed="false">🐭</button>
-            <button class="avatar-option" type="button" data-icon="🐍" aria-label="Snake" aria-pressed="false">🐍</button>
-            <button class="avatar-option" type="button" data-icon="🐛" aria-label="Caterpillar" aria-pressed="false">🐛</button>
-            <button class="avatar-option" type="button" data-icon="🦋" aria-label="Butterfly" aria-pressed="false">🦋</button>
-            <button class="avatar-option" type="button" data-icon="🦉" aria-label="Owl" aria-pressed="false">🦉</button>
-            <button class="avatar-option" type="button" data-icon="🦊" aria-label="Fox" aria-pressed="false">🦊</button>
-          </div>
-        </fieldset>
         <details class="settings-panel">
           <summary>
             <span>Practice settings</span>
@@ -90,6 +77,10 @@
               <span>Sound effects</span>
               <span class="sound-control"><input id="sound-toggle" type="checkbox" /> <span>Play feedback tones</span></span>
             </label>
+            <label class="sound-setting">
+              <span>Music</span>
+              <span class="sound-control"><input id="music-toggle" type="checkbox" /> <span>Play DnB study loop</span></span>
+            </label>
           </div>
           <p id="level-description" class="settings-description">20 questions with a relaxed 10-minute timer.</p>
         </details>
@@ -102,6 +93,17 @@
           </div>
           <ol id="leaderboard-list" class="leaderboard-list"></ol>
         </section>
+        <details class="progress-panel">
+          <summary>Progress data</summary>
+          <div class="progress-table-wrap">
+            <table class="progress-table">
+              <thead><tr><th>Date</th><th>Mode</th><th>Score</th><th>Correct</th><th>Time</th></tr></thead>
+              <tbody id="progress-body"></tbody>
+            </table>
+          </div>
+          <p id="progress-empty" class="progress-empty">Complete a round to begin tracking progress.</p>
+          <button id="export-progress" class="text-button" type="button">Download CSV</button>
+        </details>
       </section>
 
       <section id="quiz-screen" class="card quiz-screen" hidden>
@@ -140,10 +142,13 @@
         </div>
         <div id="result-message" class="result-message"></div>
         <div id="corrections" class="corrections"></div>
-        <button id="retry-button" class="primary-button" type="button">Try another round</button>
+        <div class="result-actions">
+          <button id="home-button" class="secondary-button" type="button">Home</button>
+          <button id="retry-button" class="primary-button" type="button">Try another round</button>
+        </div>
       </section>
     </main>
 
-    <script src="app-v8.js?v=11"></script>
+    <script src="app-v8.js?v=12"></script>
   </body>
 </html>

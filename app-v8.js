@@ -8,14 +8,13 @@
     3: { name: "Prodigy", count: null, seconds: 120, text: "Prodigy: answer as many questions as you can in 2 minutes." },
   };
   const DEFAULTS = { level: 1, range: 10, focus: "all" };
-  const ICONS = ["🐨", "🐻", "🐭", "🐍", "🐛", "🦋", "🦉", "🦊"];
   const $ = (selector) => document.querySelector(selector);
   const el = {
     start: $("#start-screen"), quiz: $("#quiz-screen"), results: $("#results-screen"),
-    startButton: $("#start-button"), retryButton: $("#retry-button"), timer: $("#timer"),
+    startButton: $("#start-button"), retryButton: $("#retry-button"), homeButton: $("#home-button"), timer: $("#timer"),
     roundLabel: $("#round-label"), records: $("#records"), playerName: $("#player-name"),
-    playerList: $("#player-list"), playerError: $("#player-error"), avatarButtons: document.querySelectorAll(".avatar-option"), level: $("#level-select"),
-    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), settingsSummary: $("#settings-summary"),
+    playerList: $("#player-list"), playerError: $("#player-error"), level: $("#level-select"),
+    range: $("#range-select"), focus: $("#focus-select"), sound: $("#sound-toggle"), music: $("#music-toggle"), settingsSummary: $("#settings-summary"),
     levelDescription: $("#level-description"), leaderboard: $("#leaderboard-list"),
     leaderboardRule: $("#leaderboard-rule"), stripAnswered: $("#strip-answered"),
     stripRemaining: $("#strip-remaining"), stripReview: $("#strip-review"),
@@ -24,12 +23,13 @@
     choices: $("#choices"), quizNote: $("#quiz-note"), resultHeading: $("#result-heading"),
     score: $("#score"), correctCount: $("#correct-count"), elapsedTime: $("#elapsed-time"),
     answerFeedback: $("#answer-feedback"), resultMessage: $("#result-message"), corrections: $("#corrections"),
+    progressBody: $("#progress-body"), progressEmpty: $("#progress-empty"), exportProgress: $("#export-progress"),
   };
 
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
-  let selectedIcon = ICONS[0];
   let audioContext = null;
+  let musicTimer = null, musicMaster = null, nextMusicNote = 0, musicStep = 0;
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
   function cleanRecords(value) {
@@ -55,14 +55,14 @@
   const playerKey = (value) => cleanName(value).toLocaleLowerCase();
   function cleanPlayer(value, fallback) {
     const displayName = cleanName((value && value.displayName) || fallback);
-    const icon = value && ICONS.includes(value.icon) ? value.icon : ICONS[0];
+    const history = value && Array.isArray(value.history) ? value.history.slice(-200) : [];
     const recordsByMode = {};
     if (value && value.recordsByMode && typeof value.recordsByMode === "object") {
       Object.entries(value.recordsByMode).forEach(([key, records]) => { recordsByMode[key] = cleanRecords(records); });
     } else if (value && typeof value === "object") {
       recordsByMode["level1-range12-mixed"] = cleanRecords(value);
     }
-    return { displayName, icon, recordsByMode };
+    return { displayName, history, recordsByMode };
   }
   function load() {
     try {
@@ -76,10 +76,10 @@
       return {
         version: 4, players, currentPlayer: typeof saved.currentPlayer === "string" ? saved.currentPlayer : "",
         settings: cleanSettings(saved.settings),
-        sound: saved.sound === true,
+        sound: saved.sound === true, music: saved.music === true,
         legacy: saved.legacy || (oldFields.some((field) => Object.prototype.hasOwnProperty.call(saved, field)) ? cleanRecords(saved) : null),
       };
-    } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, legacy: null }; }
+    } catch { return { version: 4, players: {}, currentPlayer: "", settings: { ...DEFAULTS }, sound: false, music: false, legacy: null }; }
   }
   const save = (state) => localStorage.setItem(STORE, JSON.stringify(state));
   const settingsFromUI = () => cleanSettings({ level: el.level.value, range: el.range.value, focus: el.focus.value });
@@ -185,33 +185,48 @@
     ranking.slice(0, 5).forEach((player, position) => {
       const row = document.createElement("li"); row.className = "leaderboard-row";
       const rank = document.createElement("span"); rank.className = "leaderboard-rank"; rank.textContent = position + 1;
-      const name = document.createElement("span"); name.className = "leaderboard-name";
-      const avatar = document.createElement("span"); avatar.className = "leaderboard-avatar"; avatar.textContent = player.icon;
-      const playerName = document.createElement("span"); playerName.textContent = player.displayName;
-      name.append(avatar, playerName);
+      const name = document.createElement("span"); name.className = "leaderboard-name"; name.textContent = player.displayName;
       const result = document.createElement("span"); result.className = "leaderboard-time";
       result.textContent = settings.level === 3 ? `${player.record.bestScore}% · ${player.record.bestCorrect}` : formatTime(player.record.fastestPerfect);
       row.append(rank, name, result); el.leaderboard.append(row);
     });
   }
-  function refresh() {
-    showSettings(); showRecords(); showPlayers();
-    const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
-  }
-  function showSelectedIcon() {
-    el.avatarButtons.forEach((button) => {
-      const selected = button.dataset.icon === selectedIcon;
-      button.classList.toggle("selected", selected);
-      button.setAttribute("aria-pressed", String(selected));
+  function showProgress() {
+    const player = load().players[playerKey(el.playerName.value)];
+    const history = player && Array.isArray(player.history) ? player.history.slice(-20).reverse() : [];
+    el.progressBody.replaceChildren();
+    history.forEach((round) => {
+      const row = document.createElement("tr");
+      const values = [
+        new Date(round.completedAt).toLocaleDateString(),
+        round.mode,
+        `${round.score}%`,
+        `${round.correct}/${round.answered}`,
+        formatTime(round.elapsed),
+      ];
+      values.forEach((value) => { const cell = document.createElement("td"); cell.textContent = value; row.append(cell); });
+      el.progressBody.append(row);
     });
+    el.progressEmpty.hidden = history.length > 0;
+    el.exportProgress.hidden = history.length === 0;
   }
-  function selectIcon(icon) {
-    if (!ICONS.includes(icon)) return;
-    selectedIcon = icon; showSelectedIcon();
-    const state = load(), key = playerKey(el.playerName.value);
-    if (state.players[key]) {
-      state.players[key].icon = selectedIcon; save(state); showPlayers();
-    }
+  function exportProgress() {
+    const player = load().players[playerKey(el.playerName.value)];
+    if (!player || !player.history || !player.history.length) return;
+    const rows = [["Date", "Player", "Mode", "Range", "Table", "Score", "Correct", "Answered", "Time seconds"]];
+    player.history.forEach((round) => rows.push([
+      round.completedAt, player.displayName, LEVELS[round.level].name, `0-${round.range}`,
+      round.focus === "all" ? "Mixed" : `x${round.focus}`, round.score, round.correct, round.answered, round.elapsed,
+    ]));
+    const csv = rows.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    link.download = `${player.displayName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "player"}-multiplication-progress.csv`;
+    link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }
+  function refresh() {
+    showSettings(); showRecords(); showPlayers(); showProgress();
+    const state = load(); state.settings = settingsFromUI(); state.sound = el.sound.checked; state.music = el.music.checked; save(state);
   }
 
   function playTone(isCorrect) {
@@ -232,6 +247,58 @@
         oscillator.start(now + note * 0.09); oscillator.stop(now + note * 0.09 + 0.14);
       });
     } catch { /* Visual feedback remains available if audio is blocked. */ }
+  }
+  function scheduleMusicTone(frequency, time, duration, type, volume) {
+    const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
+    oscillator.type = type; oscillator.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.0001, time); gain.gain.exponentialRampToValueAtTime(volume, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    oscillator.connect(gain).connect(musicMaster); oscillator.start(time); oscillator.stop(time + duration + 0.02);
+  }
+  function scheduleMusicNoise(time, duration, volume, highpass) {
+    const length = Math.max(1, Math.floor(audioContext.sampleRate * duration));
+    const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate), data = buffer.getChannelData(0);
+    for (let i = 0; i < length; i += 1) data[i] = Math.random() * 2 - 1;
+    const source = audioContext.createBufferSource(), filter = audioContext.createBiquadFilter(), gain = audioContext.createGain();
+    source.buffer = buffer; filter.type = "highpass"; filter.frequency.value = highpass;
+    gain.gain.setValueAtTime(volume, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    source.connect(filter).connect(gain).connect(musicMaster); source.start(time); source.stop(time + duration);
+  }
+  function scheduleMusicStep(step, time) {
+    if ([0, 7, 10].includes(step)) {
+      const kick = audioContext.createOscillator(), gain = audioContext.createGain();
+      kick.type = "sine"; kick.frequency.setValueAtTime(145, time); kick.frequency.exponentialRampToValueAtTime(45, time + 0.12);
+      gain.gain.setValueAtTime(0.12, time); gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.14);
+      kick.connect(gain).connect(musicMaster); kick.start(time); kick.stop(time + 0.15);
+    }
+    if (step === 4 || step === 12) scheduleMusicNoise(time, 0.12, 0.07, 900);
+    if (step % 2 === 0) scheduleMusicNoise(time, 0.035, 0.018, 5200);
+    const bassNotes = { 0: 55, 3: 55, 6: 65.41, 8: 73.42, 11: 65.41, 14: 49 };
+    if (bassNotes[step]) scheduleMusicTone(bassNotes[step], time, 0.16, "sawtooth", 0.025);
+    const plucks = { 0: 440, 4: 523.25, 8: 659.25, 12: 523.25 };
+    if (plucks[step]) scheduleMusicTone(plucks[step], time, 0.1, "triangle", 0.018);
+  }
+  function runMusicScheduler() {
+    while (nextMusicNote < audioContext.currentTime + 0.12) {
+      scheduleMusicStep(musicStep, nextMusicNote); musicStep = (musicStep + 1) % 16; nextMusicNote += 60 / 174 / 4;
+    }
+  }
+  function startMusic() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass || musicTimer) return;
+    if (!audioContext) audioContext = new AudioContextClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    musicMaster = audioContext.createGain(); musicMaster.gain.value = 0.55; musicMaster.connect(audioContext.destination);
+    musicStep = 0; nextMusicNote = audioContext.currentTime + 0.05; runMusicScheduler();
+    musicTimer = setInterval(runMusicScheduler, 25);
+  }
+  function stopMusic() {
+    if (musicTimer) clearInterval(musicTimer); musicTimer = null;
+    if (musicMaster && audioContext) {
+      musicMaster.gain.setTargetAtTime(0.0001, audioContext.currentTime, 0.04);
+      const oldMaster = musicMaster; setTimeout(() => oldMaster.disconnect(), 250);
+    }
+    musicMaster = null;
   }
   function screen(name) { el.start.hidden = name !== "start"; el.quiz.hidden = name !== "quiz"; el.results.hidden = name !== "results"; }
   function updateTimer() {
@@ -275,9 +342,8 @@
     const displayName = cleanName(el.playerName.value);
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
-    if (!state.players[key]) state.players[key] = { displayName, icon: selectedIcon, recordsByMode: {} };
-    state.players[key].icon = selectedIcon;
-    state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
+    if (!state.players[key]) state.players[key] = { displayName, history: [], recordsByMode: {} };
+    state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; state.music = el.music.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
   function start(select = false) {
@@ -301,7 +367,15 @@
       if (item.isCorrect) { if (weight <= 1) delete records.missedFacts[fact]; else records.missedFacts[fact] = weight - 1; }
       else records.missedFacts[fact] = Math.min(6, weight + 2);
     });
-    records.roundsCompleted += 1; player.recordsByMode[key] = records; state.settings = activeSettings; save(state);
+    records.roundsCompleted += 1; player.recordsByMode[key] = records;
+    if (!Array.isArray(player.history)) player.history = [];
+    player.history.push({
+      completedAt: new Date().toISOString(), level: activeSettings.level, range: activeSettings.range,
+      focus: activeSettings.focus, mode: settingsName(activeSettings), score, correct,
+      answered: answers.length, elapsed,
+    });
+    player.history = player.history.slice(-200);
+    state.settings = activeSettings; save(state);
   }
   function showCorrections() {
     const missed = answers.filter((item) => !item.isCorrect);
@@ -318,26 +392,30 @@
     el.resultMessage.textContent = activeSettings.level === 3 ? `You answered ${answers.length} questions and got ${correct} correct. Keep accuracy high as your total grows.`
       : timedOut ? `Time is up. You answered ${answers.length} of ${level.count} questions. Review, then try again.`
         : score === 100 ? "Excellent work. Try again when you are ready to improve your time." : "Good practice. Practice the missed problems, then try another round.";
-    storeResult(score, correct, elapsed); showCorrections(); showRecords(); showPlayers(); screen("results"); el.retryButton.focus();
+    storeResult(score, correct, elapsed); showCorrections(); showRecords(); showPlayers(); showProgress(); screen("results"); el.retryButton.focus();
   }
 
-  el.startButton.addEventListener("click", () => start(true)); el.retryButton.addEventListener("click", () => start(false));
+  function goHome() {
+    clearInterval(timerId); timerId = null; clearTimeout(unlockId); locked = false;
+    el.timer.textContent = formatTime(LEVELS[settingsFromUI().level].seconds);
+    screen("start"); refresh(); el.startButton.focus();
+  }
+
+  el.startButton.addEventListener("click", () => start(true)); el.retryButton.addEventListener("click", () => start(false)); el.homeButton.addEventListener("click", goHome);
   el.playerName.addEventListener("input", () => {
-    el.playerError.textContent = ""; showRecords();
-    const player = load().players[playerKey(el.playerName.value)];
-    if (player) { selectedIcon = player.icon; showSelectedIcon(); }
+    el.playerError.textContent = ""; showRecords(); showProgress();
   });
   el.playerName.addEventListener("keydown", (event) => { if (event.key === "Enter") start(true); });
   el.level.addEventListener("change", refresh); el.focus.addEventListener("change", refresh); el.sound.addEventListener("change", refresh);
-  el.avatarButtons.forEach((button) => { button.addEventListener("click", () => selectIcon(button.dataset.icon)); });
+  el.music.addEventListener("change", () => { if (el.music.checked) startMusic(); else stopMusic(); refresh(); });
+  el.exportProgress.addEventListener("click", exportProgress);
   el.range.addEventListener("change", () => { fillFocus(Number(el.range.value), el.focus.value); refresh(); });
 
-  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; fillFocus(initial.settings.range, initial.settings.focus);
+  const initial = load(); el.level.value = initial.settings.level; el.range.value = initial.settings.range; el.sound.checked = initial.sound; el.music.checked = initial.music; fillFocus(initial.settings.range, initial.settings.focus);
   if (initial.players[initial.currentPlayer]) {
     el.playerName.value = initial.players[initial.currentPlayer].displayName;
-    selectedIcon = initial.players[initial.currentPlayer].icon;
   }
-  showSelectedIcon();
   refresh();
+  document.addEventListener("pointerdown", () => { if (el.music.checked) startMusic(); }, { once: true });
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("service-worker.js").catch(() => {});
 })();

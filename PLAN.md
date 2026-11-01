@@ -32,7 +32,10 @@ Help a child build fast, accurate recall of multiplication facts from 0 through 
 - [x] Add Student, Scholar, and Prodigy levels with separate records.
 - [x] Rename the levels Student, Scholar, and Prodigy.
 - [x] Add correct and incorrect feedback effects with optional sound.
-- [x] Add selectable animal icons to player profiles and leaderboard entries.
+- [ ] Design original player characters before restoring profile icons.
+- [x] Add a results-screen Home button.
+- [x] Add per-player round history and CSV progress export.
+- [x] Add an optional local DnB study loop control.
 - [ ] Add a simple 30-minute daily-practice indicator.
 
 ## Phase 3 — Motivation and progress

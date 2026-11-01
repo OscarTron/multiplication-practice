@@ -13,7 +13,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
-- Eight selectable animal icons saved with each player profile.
+- Home navigation from the results screen.
+- Per-player round history with an on-screen progress table and CSV download.
+- An optional offline procedural DnB study loop while the final Suno track is selected.
 - Correct and incorrect answer animations with optional device-generated tones.
 - A saved sound-effects setting that defaults to off.
 - Practice settings for standard 0–10 and extended 0–12 ranges.
@@ -30,7 +32,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Introduced an original, offline sci-fi interface typography treatment.
-- Added player animals to family leaderboard entries.
 - Renamed the three levels Student, Scholar, and Prodigy.
 - Made Level 1 with mixed 0–10 facts the default practice mode.
 - Simplified adaptive-practice wording for younger readers.
@@ -46,6 +47,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Changed offline loading to prefer the newest published files before cached copies.
 - Versioned app assets so existing offline installations receive new code after updates.
 - Prevented rapid or queued double-clicks from recording two answers or skipping a question.
+
+### Removed
+
+- Temporary emoji animal profiles pending original character designs.
 
 ## [0.1.0] - 2026-11-01
 

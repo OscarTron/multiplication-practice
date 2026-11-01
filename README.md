@@ -26,8 +26,10 @@ Student uses the original 20-question, 10-minute format. Scholar gives 30 questi
 - Three selectable practice levels with separate records
 - Correct and incorrect visual feedback with optional sound effects
 - Player profiles with separate practice records
-- Selectable animal icons for each player profile
 - Device-local family leaderboard for perfect rounds
+- Round-by-round progress table with CSV download
+- Home navigation from completed rounds
+- Optional locally generated DnB study loop
 - Device-local records and offline caching
 - Responsive keyboard-accessible interface
 - Original sci-fi interface typography using an offline system-font stack
@@ -50,7 +52,7 @@ No account, server, analytics, or paid service is required. Progress remains in 
 
 ## Privacy
 
-Player names, scores, and practice history stay in the current browser. The family leaderboard is visible only on that device. The app does not send or collect personal information.
+Player names, scores, and practice history stay in the current browser. The family leaderboard and progress table are visible only on that device. The app does not send or collect personal information.
 
 ## Project documents
 

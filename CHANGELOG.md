@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Portfolio-focused repository documentation, architecture notes, and contribution guidance.
 - A compact recent-progress summary with five-round average, score change, and best perfect time.
 - A Learn section with an interactive multiplication chart and five-minute multi-table flashcards.
 - A five-minute Student practice option.

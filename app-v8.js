@@ -175,7 +175,7 @@
     const repeats = Object.values(records.missedFacts).filter((weight) => weight > 0).length;
     el.records.innerHTML = settings.level === 3
       ? `<div class="record"><strong>${records.bestScore}%</strong><span>Best Accuracy</span></div><div class="record"><strong>${records.bestCorrect}</strong><span>Most Correct</span></div><div class="record"><strong>${repeats}</strong><span>Repeats Next Round</span></div>`
-      : `<div class="record"><strong>${records.bestScore}%</strong><span>Best Score</span></div><div class="record"><strong>${records.fastestPerfect === null ? "—" : formatTime(records.fastestPerfect)}</strong><span>Fastest 100%</span></div><div class="record"><strong>${repeats}</strong><span>Repeats Next Round</span></div>`;
+      : `<div class="record"><strong>${records.bestScore}%</strong><span>Best Score</span></div><div class="record"><strong>${records.fastestPerfect === null ? "N/A" : formatTime(records.fastestPerfect)}</strong><span>Fastest 100%</span></div><div class="record"><strong>${repeats}</strong><span>Repeats Next Round</span></div>`;
   }
   function showPlayers() {
     const state = load(), settings = settingsFromUI(), key = modeKey(settings);
@@ -212,8 +212,8 @@
       const average = Math.round(recent.reduce((total, round) => total + Number(round.score || 0), 0) / recent.length);
       const change = recent.length > 1 ? Number(recent[recent.length - 1].score || 0) - Number(recent[0].score || 0) : null;
       const perfectTimes = recent.filter((round) => Number(round.score) === 100 && Number.isFinite(Number(round.elapsed))).map((round) => Number(round.elapsed));
-      const changeValue = change === null ? "—" : `${change > 0 ? "+" : ""}${change} pts`;
-      el.recentSummary.innerHTML = `<div><strong>${average}%</strong><span>Average Score</span></div><div><strong>${changeValue}</strong><span>Score Change</span></div><div><strong>${perfectTimes.length ? formatTime(Math.min(...perfectTimes)) : "—"}</strong><span>Best Perfect Time</span></div>`;
+      const changeValue = change === null ? "N/A" : `${change > 0 ? "+" : ""}${change} pts`;
+      el.recentSummary.innerHTML = `<div><strong>${average}%</strong><span>Average Score</span></div><div><strong>${changeValue}</strong><span>Score Change</span></div><div><strong>${perfectTimes.length ? formatTime(Math.min(...perfectTimes)) : "N/A"}</strong><span>Best Perfect Time</span></div>`;
     }
     el.progressBody.replaceChildren();
     history.forEach((round) => {
@@ -398,7 +398,7 @@
   }
   function showCorrections() {
     const missed = answers.filter((item) => !item.isCorrect);
-    if (!missed.length) { el.corrections.innerHTML = '<p class="correct-message">Perfect round—every answer was correct!</p>'; return; }
+    if (!missed.length) { el.corrections.innerHTML = '<p class="correct-message">Perfect round! Every answer was correct!</p>'; return; }
     const rows = missed.map((item) => `<li><span>${item.left} × ${item.right}</span><span>You chose <strong>${item.selected}</strong> · Answer <strong>${item.correct}</strong></span></li>`).join("");
     el.corrections.innerHTML = `<h3>Practice These Again</h3><ul class="correction-list">${rows}</ul>`;
   }
@@ -409,7 +409,7 @@
     el.score.textContent = `${score}%`; el.correctCount.textContent = `${correct}/${activeSettings.level === 3 ? answers.length : level.count}`; el.elapsedTime.textContent = formatTime(elapsed);
     el.resultHeading.textContent = score === 100 && answers.length ? "Perfect Accuracy!" : "Round Complete!";
     el.resultMessage.textContent = activeSettings.level === 3 ? `You answered ${answers.length} questions and got ${correct} correct. Keep accuracy high as your total grows.`
-      : timedOut ? `Time is up! You answered ${answers.length} of ${level.count} questions. Great effort—every round makes you stronger.`
+      : timedOut ? `Time is up! You answered ${answers.length} of ${level.count} questions. Great effort! Every round makes you stronger.`
         : score === 100 ? "Excellent work. Try again when you are ready to improve your time." : "Good practice. Practice the missed problems, then try another round.";
     storeResult(score, correct, elapsed); showCorrections(); showRecords(); showPlayers(); showProgress(); screen("results"); el.retryButton.focus();
   }

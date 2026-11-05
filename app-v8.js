@@ -29,12 +29,15 @@
     chartWrap: $("#chart-wrap"), tableCheckboxes: $("#table-checkboxes"), selectAllTables: $("#select-all-tables"), clearTables: $("#clear-tables"),
     startCards: $("#start-cards"), cardsError: $("#cards-error"), cardSetup: $("#card-setup"), cardSession: $("#card-session"), cardComplete: $("#card-complete"),
     studyCard: $("#study-card"), cardProgress: $("#card-progress"), previousCard: $("#previous-card"), nextCard: $("#next-card"), restartCards: $("#restart-cards"),
+    studyQuestion: $("#study-question"), studyAnswer: $("#study-answer"), studyFamily: $("#study-family"),
+    shuffleCards: $("#shuffle-cards"), knowCard: $("#know-card"), learnCard: $("#learn-card"), knowCount: $("#know-count"), learnCount: $("#learn-count"),
   };
 
   let questions = [], answers = [], index = 0, startedAt = 0, timerId = null, unlockId = null;
   let reviewCount = 0, locked = false, activePlayer = "", activeSettings = { ...DEFAULTS };
   let audioContext = null;
   let studyCards = [], studyIndex = 0, studyStartedAt = 0, studyTimerId = null;
+  let flashKnow = new Set(), flashLearn = new Set(), flashPlayerKey = "";
 
   const emptyRecords = () => ({ bestScore: 0, fastestPerfect: null, bestCorrect: 0, missedFacts: {}, roundsCompleted: 0 });
   function cleanRecords(value) {
@@ -59,6 +62,36 @@
   const modeKey = (settings) => `level${settings.level}-range${settings.range}-${settings.focus === "all" ? "mixed" : `table${settings.focus}`}`;
   const cleanName = (value) => value.trim().replace(/\s+/g, " ").slice(0, 16);
   const playerKey = (value) => cleanName(value).toLocaleLowerCase();
+  function cleanFlashcards(value) {
+    const cleanSet = (list) => {
+      const facts = new Set();
+      if (Array.isArray(list)) list.forEach((key) => { const fact = parseFact(key); if (fact) facts.add(factKey(fact.left, fact.right)); });
+      return facts;
+    };
+    const source = value && typeof value === "object" ? value : {};
+    return { known: [...cleanSet(source.known)], learning: [...cleanSet(source.learning)] };
+  }
+  function flashcardPlayerKey() {
+    const typed = playerKey(el.playerName.value);
+    if (typed) return typed;
+    const state = load();
+    return state.currentPlayer && state.players[state.currentPlayer] ? state.currentPlayer : "";
+  }
+  function loadFlashcardSets() {
+    flashPlayerKey = flashcardPlayerKey();
+    flashKnow = new Set(); flashLearn = new Set();
+    if (!flashPlayerKey) return;
+    const player = load().players[flashPlayerKey];
+    if (player && player.flashcards) { flashKnow = new Set(player.flashcards.known || []); flashLearn = new Set(player.flashcards.learning || []); }
+  }
+  function saveFlashcardSets() {
+    if (!flashPlayerKey) return;
+    const state = load();
+    let player = state.players[flashPlayerKey];
+    if (!player) { player = { displayName: cleanName(el.playerName.value) || flashPlayerKey, history: [], recordsByMode: {}, flashcards: { known: [], learning: [] } }; state.players[flashPlayerKey] = player; }
+    player.flashcards = { known: [...flashKnow], learning: [...flashLearn] };
+    save(state);
+  }
   function cleanPlayer(value, fallback) {
     const displayName = cleanName((value && value.displayName) || fallback);
     const history = value && Array.isArray(value.history) ? value.history.slice(-200) : [];
@@ -68,7 +101,7 @@
     } else if (value && typeof value === "object") {
       recordsByMode["level1-range12-mixed"] = cleanRecords(value);
     }
-    return { displayName, history, recordsByMode };
+    return { displayName, history, recordsByMode, flashcards: cleanFlashcards(value && value.flashcards) };
   }
   function load() {
     try {
@@ -299,9 +332,23 @@
     }
   }
   function renderStudyCard() {
-    const card = studyCards[studyIndex]; el.studyCard.innerHTML = `<span>${card.left} × ${card.right}</span><strong>= ${card.left * card.right}</strong>`;
-    el.cardProgress.textContent = `Card ${studyIndex + 1} of ${studyCards.length}`; el.previousCard.disabled = studyIndex === 0;
+    const card = studyCards[studyIndex];
+    el.studyCard.classList.remove("flipped");
+    el.studyQuestion.textContent = `${card.left} × ${card.right}`;
+    el.studyAnswer.textContent = `${card.left * card.right}`;
+    el.studyFamily.textContent = `because ${card.left} × ${card.right} = ${card.left * card.right}`;
+    el.cardProgress.textContent = `Card ${studyIndex + 1} of ${studyCards.length} • Knew it: ${flashKnow.size} • Still learning: ${flashLearn.size}`;
+    el.knowCount.textContent = flashKnow.size;
+    el.learnCount.textContent = flashLearn.size;
   }
+  function markFlashcard(known) {
+    const card = studyCards[studyIndex]; if (!card) return;
+    const key = factKey(card.left, card.right);
+    if (known) { flashKnow.add(key); flashLearn.delete(key); } else { flashLearn.add(key); flashKnow.delete(key); }
+    saveFlashcardSets();
+    studyIndex = (studyIndex + 1) % studyCards.length; renderStudyCard();
+  }
+  function shuffleStudyCards() { studyCards = shuffle(studyCards); studyIndex = 0; renderStudyCard(); }
   function finishStudy() {
     clearInterval(studyTimerId); studyTimerId = null; el.timer.textContent = "0:00"; el.timerPanel.hidden = true; el.cardSession.hidden = true; el.cardComplete.hidden = false; el.restartCards.focus();
   }
@@ -311,7 +358,7 @@
   function startStudy() {
     const selected = [...el.tableCheckboxes.querySelectorAll("input:checked")].map((input) => Number(input.value));
     if (!selected.length) { el.cardsError.textContent = "Choose at least one table."; return; }
-    const range = Number(el.range.value); studyCards = shuffle(selected.flatMap((left) => Array.from({ length: range + 1 }, (_, right) => ({ left, right }))));
+    const range = Number(el.range.value); loadFlashcardSets(); studyCards = shuffle(selected.flatMap((left) => Array.from({ length: range + 1 }, (_, right) => ({ left, right }))));
     studyIndex = 0; studyStartedAt = Date.now(); el.cardsError.textContent = ""; el.cardSetup.hidden = true; el.cardComplete.hidden = true; el.cardSession.hidden = false;
     el.timer.textContent = "5:00"; el.timerPanel.hidden = false; renderStudyCard(); clearInterval(studyTimerId); studyTimerId = setInterval(updateStudyTimer, 250);
   }
@@ -361,7 +408,7 @@
     const displayName = cleanName(el.playerName.value);
     if (!displayName) { el.playerError.textContent = "Enter a player name to begin."; el.playerName.focus(); return false; }
     const key = playerKey(displayName), state = load();
-    if (!state.players[key]) state.players[key] = { displayName, history: [], recordsByMode: {} };
+    if (!state.players[key]) state.players[key] = { displayName, history: [], recordsByMode: {}, flashcards: { known: [], learning: [] } };
     state.currentPlayer = key; state.settings = settingsFromUI(); state.sound = el.sound.checked; save(state);
     activePlayer = key; el.playerName.value = state.players[key].displayName; el.playerError.textContent = ""; showPlayers(); return true;
   }
@@ -427,7 +474,12 @@
   el.clearTables.addEventListener("click", () => el.tableCheckboxes.querySelectorAll("input").forEach((input) => { input.checked = false; }));
   el.startCards.addEventListener("click", startStudy);
   el.restartCards.addEventListener("click", () => { buildTableChoices(); el.timer.textContent = "5:00"; el.cardSetup.hidden = false; el.cardComplete.hidden = true; });
-  el.previousCard.addEventListener("click", () => { if (studyIndex > 0) { studyIndex -= 1; renderStudyCard(); } });
+  el.studyCard.addEventListener("click", () => el.studyCard.classList.toggle("flipped"));
+  el.studyCard.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); el.studyCard.classList.toggle("flipped"); } });
+  el.shuffleCards.addEventListener("click", shuffleStudyCards);
+  el.knowCard.addEventListener("click", () => markFlashcard(true));
+  el.learnCard.addEventListener("click", () => markFlashcard(false));
+  el.previousCard.addEventListener("click", () => { studyIndex = (studyIndex - 1 + studyCards.length) % studyCards.length; renderStudyCard(); });
   el.nextCard.addEventListener("click", () => { studyIndex = (studyIndex + 1) % studyCards.length; renderStudyCard(); });
   el.playerName.addEventListener("input", () => {
     el.playerError.textContent = ""; showRecords(); showProgress();

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#18a999" />
     <meta name="description" content="Practice multiplication facts with focused tables and timed levels." />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css?v=25" />
+    <link rel="stylesheet" href="styles.css?v=26" />
     <title>Multiplication Practice</title>
   </head>
   <body>
@@ -139,15 +139,23 @@
       <section id="cards-screen" class="card learn-screen" hidden>
         <div class="learn-header"><div><p class="eyebrow">LEARN</p><h2>5 Minute Flashcards</h2></div><button id="cards-home" class="secondary-button" type="button">Home</button></div>
         <div id="card-setup">
-          <p class="learn-note">Choose one or more tables. Every card shows the problem and answer.</p>
+          <p class="learn-note">Choose one or more tables. Tap a card to flip it and reveal the answer.</p>
           <div class="table-select-actions"><button id="select-all-tables" class="text-button" type="button">Select All</button><button id="clear-tables" class="text-button" type="button">Clear All</button></div>
           <div id="table-checkboxes" class="table-checkboxes"></div>
           <p id="cards-error" class="field-error" role="alert"></p>
           <button id="start-cards" class="primary-button" type="button">Start 5-Minute Study</button>
         </div>
         <div id="card-session" hidden>
-          <p id="card-progress" class="card-progress"></p><div id="study-card" class="study-card" aria-live="polite"></div>
-          <div class="card-actions"><button id="previous-card" class="secondary-button" type="button">Previous</button><button id="next-card" class="primary-button" type="button">Next Card</button></div>
+          <p class="learn-note">Tap the card to flip it. Say the answer out loud before you flip!</p>
+          <p id="card-progress" class="card-progress"></p>
+          <div id="study-card" class="study-card" role="button" tabindex="0" aria-label="Flashcard, tap to flip" aria-live="polite">
+            <div class="study-card-inner">
+              <div class="study-face study-face-front"><span class="study-face-label">What is</span><span id="study-question"></span><span class="study-face-hint">Tap to reveal</span></div>
+              <div class="study-face study-face-back"><span class="study-face-label">Answer</span><strong id="study-answer"></strong><span id="study-family"></span></div>
+            </div>
+          </div>
+          <div class="card-actions"><button id="previous-card" class="secondary-button" type="button">Previous</button><button id="shuffle-cards" class="secondary-button" type="button">Shuffle</button><button id="next-card" class="primary-button" type="button">Next Card</button></div>
+          <div class="card-actions"><button id="know-card" class="secondary-button" type="button">I know it (<span id="know-count">0</span>)</button><button id="learn-card" class="secondary-button" type="button">Still learning (<span id="learn-count">0</span>)</button></div>
         </div>
         <div id="card-complete" class="card-complete" hidden>
           <div class="celebration" aria-hidden="true">★</div><h2>Study Complete!</h2><p>Great focus! Five minutes of review makes every fact easier to remember.</p>
@@ -198,6 +206,6 @@
       </section>
     </main>
 
-    <script src="app-v8.js?v=25"></script>
+    <script src="app-v8.js?v=26"></script>
   </body>
 </html>
